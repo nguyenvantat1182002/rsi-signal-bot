@@ -4,13 +4,12 @@ import pandas_ta as ta
 import detector
 import threading
 import time
-import numpy as np
 
 from datetime import datetime, timedelta
 
 
 def create_data_frame(symbol: str, timeframe: int) -> pd.DataFrame:
-    rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, 200)
+    rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, 300)
     
     df = pd.DataFrame(rates)
 
@@ -26,6 +25,10 @@ def create_data_frame(symbol: str, timeframe: int) -> pd.DataFrame:
 risk_amount = 50
 watchlist = {
     'BTCUSD': {
+        'timeframe': mt5.TIMEFRAME_M5,
+        'unit_factor': 0
+    },
+    'ETHUSD': {
         'timeframe': mt5.TIMEFRAME_M5,
         'unit_factor': 0
     },
@@ -76,10 +79,18 @@ def profit_protection_thread():
                 if price_current > take_profit:
                     watchlist[symbol]['position']['take_profit'] += price_difference
 
+                    stop_loss = position.sl
+
+                    match position.type:
+                        case 0:
+                            stop_loss =  stop_loss + price_difference
+                        case 1:
+                            stop_loss =  stop_loss - price_difference
+
                     request = {
                         'action': mt5.TRADE_ACTION_SLTP,
                         'position': position.ticket,
-                        'sl': position.sl + price_difference,
+                        'sl': stop_loss,
                     }
                     mt5.order_send(request)
 
@@ -116,6 +127,10 @@ def main():
                         watchlist[symbol]['divergence_time'] = divergence_time
 
                         if not mt5.positions_get(symbol=symbol):
+                            for item in result:
+                                print(item)
+                            print(symbol + '\n')
+
                             info_tick = mt5.symbol_info_tick(symbol)
                             order_type = None
                             entry = 0
@@ -154,8 +169,6 @@ def main():
                                 'price': entry,
                                 'sl': stop_loss,
                             }
-                            print(request)
-
                             result = mt5.order_send(request)
                             if not result.retcode == 10009:
                                 print(result)
