@@ -9,11 +9,11 @@ from datetime import datetime, timedelta
 
 
 def create_data_frame(symbol: str, timeframe: int) -> pd.DataFrame:
-    rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, 300)
+    rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, 500)
     
     df = pd.DataFrame(rates)
 
-    df['time'] = pd.to_datetime(rates['time'], unit='s')
+    df['time'] = pd.to_datetime(df['time'], unit='s')
     df['rsi'] = ta.rsi(df['close'], 14)
     df['atr'] = ta.atr(df['high'], df['low'], df['close'], 14)
 
@@ -22,36 +22,12 @@ def create_data_frame(symbol: str, timeframe: int) -> pd.DataFrame:
     return df
 
 
-risk_amount = 50
+risk_amount = 5
 watchlist = {
-    'BTCUSD': {
+    'BTCUSDm': {
         'timeframe': mt5.TIMEFRAME_M5,
         'unit_factor': 0
-    },
-    'ETHUSD': {
-        'timeframe': mt5.TIMEFRAME_M5,
-        'unit_factor': 0
-    },
-    'XAUUSD': {
-        'timeframe': mt5.TIMEFRAME_M5,
-        'unit_factor': 100
-    },
-    'EURUSD': {
-        'timeframe': mt5.TIMEFRAME_M5,
-        'unit_factor': 100000
-    },
-    'GBPUSD': {
-        'timeframe': mt5.TIMEFRAME_M5,
-        'unit_factor': 100000
-    },
-    'NZDUSD': {
-        'timeframe': mt5.TIMEFRAME_M5,
-        'unit_factor': 100000
-    },
-    'AUDUSD': {
-        'timeframe': mt5.TIMEFRAME_M5,
-        'unit_factor': 100000
-    },
+    }
 }
 
 for symbol in watchlist.keys():
