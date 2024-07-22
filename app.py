@@ -90,22 +90,22 @@ def main():
                     case _:
                         print('Chi ho tro 1m, 5m, 15m, 1h, 4h.')
                         return
-                    
-                df = create_data_frame(symbol, timeframe)
-                result = detector.detect_divergence(df)
-                if result:
-                    divergence_time = result[-1][-1][0]
+                
+                if not mt5.positions_get(symbol=symbol):
+                    df = create_data_frame(symbol, timeframe)
 
-                    if watchlist[symbol]['divergence_time'] is None:
-                        watchlist[symbol]['divergence_time'] = divergence_time
+                    result = detector.detect_divergence(df)
+                    if result:
+                        divergence_time = result[-1][-1][0]
 
-                    if divergence_time != watchlist[symbol]['divergence_time']:
-                        watchlist[symbol]['divergence_time'] = divergence_time
+                        if watchlist[symbol]['divergence_time'] is None:
+                            watchlist[symbol]['divergence_time'] = divergence_time
 
-                        if not mt5.positions_get(symbol=symbol):
+                        if divergence_time != watchlist[symbol]['divergence_time']:
+                            watchlist[symbol]['divergence_time'] = divergence_time
+
                             for item in result:
                                 print(item)
-                            print(symbol + '\n')
 
                             info_tick = mt5.symbol_info_tick(symbol)
                             order_type = None
@@ -134,7 +134,7 @@ def main():
                             watchlist[symbol]['position']['price_difference'] = price_difference
                             watchlist[symbol]['position']['take_profit'] = entry + price_difference
 
-                            trade_volume = round(trade_volume, 2)
+                            trade_volume = round(trade_volume, 2) if trade_volume >= 0.01 else 0.01
 
                             request = {
                                 'action': mt5.TRADE_ACTION_DEAL,
@@ -145,12 +145,16 @@ def main():
                                 'price': entry,
                                 'sl': stop_loss,
                             }
+                            print(symbol, trade_volume)
+                            print(request)
+                            print()
+
                             result = mt5.order_send(request)
                             if not result.retcode == 10009:
                                 print(result)
                                 return
-                        
-                watchlist[symbol]['next_search_signal_time'] = datetime.now() + time_duration
+                            
+                    watchlist[symbol]['next_search_signal_time'] = datetime.now() + time_duration
 
         time.sleep(1)
 
