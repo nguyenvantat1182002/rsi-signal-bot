@@ -105,7 +105,6 @@ def main():
                         watchlist[symbol]['divergence_time'] = divergence_time
 
                         if not mt5.positions_get(symbol=symbol):
-                            
                             for item in result:
                                 print(item)
 
