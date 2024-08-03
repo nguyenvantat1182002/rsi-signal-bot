@@ -22,7 +22,7 @@ def create_data_frame(symbol: str, timeframe: int) -> pd.DataFrame:
     return df
 
 
-risk_amount = 5
+# risk_amount = 10
 watchlist = {
     'BTCUSDm': {
         'timeframe': mt5.TIMEFRAME_M5,
@@ -91,8 +91,7 @@ def main():
                     case _:
                         print('Chi ho tro 1m, 5m, 15m, 1h, 4h.')
                         return
-                
-                
+                    
                 df = create_data_frame(symbol, timeframe)
 
                 result = detector.detect_divergence(df)
@@ -106,6 +105,7 @@ def main():
                         watchlist[symbol]['divergence_time'] = divergence_time
 
                         if not mt5.positions_get(symbol=symbol):
+                            
                             for item in result:
                                 print(item)
 
@@ -126,6 +126,10 @@ def main():
                                     entry = info_tick.bid
                                     stop_loss = entry + atr * 5
 
+                            account = mt5.account_info()
+                            balance = account.balance
+                            risk_amount = balance / 10
+                            
                             price_difference = abs(entry - stop_loss)
                             trade_volume = risk_amount / price_difference
 
