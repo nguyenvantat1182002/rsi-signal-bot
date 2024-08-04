@@ -2,4 +2,4 @@ MetaTrader5
 numpy<2
 pandas
 pandas_ta
-mplfinance
+# mplfinance

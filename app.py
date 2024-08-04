@@ -39,13 +39,31 @@ def create_data_frame(symbol: str, timeframe: int) -> pd.DataFrame:
 
 
 # risk_amount = 10
-only_buy = True
-only_sell = True
 watchlist = {
     'BTCUSD': {
         'timeframe': mt5.TIMEFRAME_M5,
-        'unit_factor': 0
-    }
+        'unit_factor': 0,
+    },
+    'XAUUSD': {
+        'timeframe': mt5.TIMEFRAME_M5,
+        'unit_factor': 100,
+    },
+    'EURUSD': {
+        'timeframe': mt5.TIMEFRAME_M5,
+        'unit_factor': 100000,
+    },
+    'GBPUSD': {
+        'timeframe': mt5.TIMEFRAME_M5,
+        'unit_factor': 100000,
+    },
+    'AUDUSD': {
+        'timeframe': mt5.TIMEFRAME_M5,
+        'unit_factor': 100000,
+    },
+    'NZDUSD': {
+        'timeframe': mt5.TIMEFRAME_M5,
+        'unit_factor': 100000,
+    },
 }
 
 for symbol in watchlist.keys():
@@ -55,7 +73,9 @@ for symbol in watchlist.keys():
         'position': {
             'price_difference': -1,
             'take_profit': -1
-        }
+        },
+        'buy_only': True,
+        'sell_only': True
     })
 
 
@@ -105,15 +125,15 @@ def main():
                 condition = check_buy_sell_conditions(symbol)
                 match condition:
                     case 0:
-                        only_buy = True
-                        only_sell = False
+                        watchlist[symbol]['buy_only'] = True
+                        watchlist[symbol]['sell_only'] = False
                     case 1:
-                        only_sell = True
-                        only_sell= False
+                        watchlist[symbol]['buy_only'] = False
+                        watchlist[symbol]['sell_only'] = True
                     case 2:
-                        only_sell = False
-                        only_sell= False
-                    
+                        watchlist[symbol]['buy_only'] = False
+                        watchlist[symbol]['sell_only'] = False
+
                 if condition != 2:
                     df = create_data_frame(symbol, timeframe)
 
@@ -121,8 +141,8 @@ def main():
                     if result:
                         divergence_time = result[-1][-1][0]
 
-                        # if watchlist[symbol]['divergence_time'] is None:
-                        #     watchlist[symbol]['divergence_time'] = divergence_time
+                        if watchlist[symbol]['divergence_time'] is None:
+                            watchlist[symbol]['divergence_time'] = divergence_time
                         
                         if divergence_time != watchlist[symbol]['divergence_time']:
                             watchlist[symbol]['divergence_time'] = divergence_time
@@ -148,7 +168,10 @@ def main():
                                         entry = info_tick.bid
                                         stop_loss = entry + atr * 5
 
-                                if (only_buy and order_type == mt5.ORDER_TYPE_BUY) or (only_sell and order_type == mt5.ORDER_TYPE_SELL):
+                                buy_only = watchlist[symbol]['buy_only']
+                                sell_only = watchlist[symbol]['sell_only']
+                                
+                                if (buy_only and order_type == mt5.ORDER_TYPE_BUY) or (sell_only and order_type == mt5.ORDER_TYPE_SELL):
                                     account = mt5.account_info()
                                     balance = account.balance
                                     risk_amount = balance / 10
@@ -188,8 +211,8 @@ def main():
                                     if not result.retcode == 10009:
                                         print(result)
                                         return
-    
-                watchlist[symbol]['next_search_signal_time'] = datetime.now() + timedelta(seconds=timeframe)
+
+                watchlist[symbol]['next_search_signal_time'] = datetime.now() + timedelta(minutes=timeframe)
 
         time.sleep(1)
 
