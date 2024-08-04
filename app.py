@@ -42,7 +42,7 @@ def create_data_frame(symbol: str, timeframe: int) -> pd.DataFrame:
 only_buy = True
 only_sell = True
 watchlist = {
-    'BTCUSDm': {
+    'BTCUSD': {
         'timeframe': mt5.TIMEFRAME_M5,
         'unit_factor': 0
     }
