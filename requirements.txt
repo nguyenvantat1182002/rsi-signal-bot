@@ -3,3 +3,6 @@ numpy<2
 pandas
 pandas_ta
 # mplfinance
+pyqt5
+pyqt5-tools
+scikit-learn

@@ -9,19 +9,20 @@ from datetime import datetime, timedelta
 
 
 def check_buy_sell_conditions(symbol: str) -> int:
-    rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_H4, 0, 2)
+    for timeframe in [mt5.TIMEFRAME_D1, mt5.TIMEFRAME_H4]:
+        rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, 2)
 
-    df = pd.DataFrame(rates)
-    df['time'] = pd.to_datetime(df['time'], unit='s')
+        df = pd.DataFrame(rates)
+        df['time'] = pd.to_datetime(df['time'], unit='s')
 
-    prev_h4_candle = df.iloc[0]
-    current_h4_candle = df.iloc[-1]
+        prev_candle = df.iloc[0]
+        current_candle = df.iloc[-1]
 
-    if current_h4_candle['low'] < prev_h4_candle['low'] and current_h4_candle['close'] > prev_h4_candle['low']:
-        return 0
-    elif current_h4_candle['high'] > prev_h4_candle['high'] and current_h4_candle['close'] < prev_h4_candle['high']:
-        return 1
-    
+        if current_candle['low'] < prev_candle['low'] and current_candle['close'] > prev_candle['low']:
+            return 0
+        elif current_candle['high'] > prev_candle['high'] and current_candle['close'] < prev_candle['high']:
+            return 1
+        
     return 2
 
 
@@ -38,7 +39,7 @@ def create_data_frame(symbol: str, timeframe: int) -> pd.DataFrame:
     return df
 
 
-# risk_amount = 10
+# risk_amount = 100
 watchlist = {
     'BTCUSD': {
         'timeframe': mt5.TIMEFRAME_M5,
