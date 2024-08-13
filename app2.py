@@ -1,13 +1,13 @@
 import MetaTrader5 as mt5
 
 from PyQt5.QtWidgets import QApplication
-from windows import EditWindow
+from windows import MainWindow
 
 
 if mt5.initialize():
     app = QApplication([])
 
-    win = EditWindow()
+    win = MainWindow()
     win.show()
 
     app.exec_()

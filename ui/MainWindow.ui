@@ -10,8 +10,20 @@
     <height>501</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>621</width>
+    <height>501</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>621</width>
+    <height>501</height>
+   </size>
+  </property>
   <property name="windowTitle">
-   <string>TRADER 1</string>
+   <string>TRADER 2</string>
   </property>
   <property name="styleSheet">
    <string notr="true">* {
@@ -31,6 +43,9 @@
     </property>
     <attribute name="horizontalHeaderDefaultSectionSize">
      <number>100</number>
+    </attribute>
+    <attribute name="horizontalHeaderStretchLastSection">
+     <bool>true</bool>
     </attribute>
     <column>
      <property name="text">
