@@ -190,7 +190,6 @@ def main():
                                 'price': entry,
                                 'sl': stop_loss,
                             }
-                            print(symbol, trade_volume)
                             print(request)
                             print()
 
