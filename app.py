@@ -9,19 +9,18 @@ from datetime import datetime, timedelta
 
 
 def check_buy_sell_conditions(symbol: str) -> int:
-    for timeframe in [mt5.TIMEFRAME_D1, mt5.TIMEFRAME_H4]:
-        rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, 2)
+    rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_D1, 0, 2)
 
-        df = pd.DataFrame(rates)
-        df['time'] = pd.to_datetime(df['time'], unit='s')
+    df = pd.DataFrame(rates)
+    df['time'] = pd.to_datetime(df['time'], unit='s')
 
-        prev_candle = df.iloc[0]
-        current_candle = df.iloc[-1]
+    prev_candle = df.iloc[0]
+    current_candle = df.iloc[-1]
 
-        if current_candle['low'] < prev_candle['low'] and current_candle['close'] > prev_candle['low']:
-            return 0
-        elif current_candle['high'] > prev_candle['high'] and current_candle['close'] < prev_candle['high']:
-            return 1
+    if current_candle['low'] < prev_candle['low'] and current_candle['close'] > prev_candle['low']:
+        return 0
+    elif current_candle['high'] > prev_candle['high'] and current_candle['close'] < prev_candle['high']:
+        return 1
         
     return 2
 
@@ -122,96 +121,83 @@ def main():
                 if not timeframe in [mt5.TIMEFRAME_M1, mt5.TIMEFRAME_M5, mt5.TIMEFRAME_M15]:
                     print('Chi ho tro 1m, 5m, 15m.')
                     return
-                        
-                condition = check_buy_sell_conditions(symbol)
-                match condition:
-                    case 0:
-                        watchlist[symbol]['buy_only'] = True
-                        watchlist[symbol]['sell_only'] = False
-                    case 1:
-                        watchlist[symbol]['buy_only'] = False
-                        watchlist[symbol]['sell_only'] = True
-                    case 2:
-                        watchlist[symbol]['buy_only'] = False
-                        watchlist[symbol]['sell_only'] = False
+                
+                df = create_data_frame(symbol, timeframe)
 
-                if condition != 2:
-                    df = create_data_frame(symbol, timeframe)
+                result = detector.detect_divergence(df)
+                if result:
+                    divergence_time = result[-1][-1][0]
+                    
+                    if divergence_time != watchlist[symbol]['divergence_time']:
+                        watchlist[symbol]['divergence_time'] = divergence_time
 
-                    result = detector.detect_divergence(df)
-                    if result:
-                        divergence_time = result[-1][-1][0]
+                        condition = check_buy_sell_conditions(symbol)
+                        watchlist[symbol]['buy_only'] = condition == 0
+                        watchlist[symbol]['sell_only'] = condition == 1
 
-                        if watchlist[symbol]['divergence_time'] is None:
-                            watchlist[symbol]['divergence_time'] = divergence_time
-                        
-                        if divergence_time != watchlist[symbol]['divergence_time']:
-                            watchlist[symbol]['divergence_time'] = divergence_time
+                        buy_only = watchlist[symbol]['buy_only']
+                        sell_only = watchlist[symbol]['sell_only']
+                        signal = result[0][-1]
 
-                            if not mt5.positions_get(symbol=symbol):
-                                for item in result:
-                                    print(item) 
-
-                                info_tick = mt5.symbol_info_tick(symbol)
-                                order_type = None
-                                entry = 0
-                                stop_loss = 0
-                                atr = df['atr'].iloc[-2]
-
-                                signal = result[0][-1]
-                                match signal:
-                                    case 0:
-                                        order_type = mt5.ORDER_TYPE_BUY
-                                        entry = info_tick.ask
-                                        stop_loss = entry - atr * 5
-                                    case 1:
-                                        order_type = mt5.ORDER_TYPE_SELL
-                                        entry = info_tick.bid
-                                        stop_loss = entry + atr * 5
-
-                                buy_only = watchlist[symbol]['buy_only']
-                                sell_only = watchlist[symbol]['sell_only']
+                        if ((signal == 0 and buy_only) or (signal == 1 and sell_only)) and not mt5.positions_get(symbol=symbol):
+                            for item in result:
+                                print(item)
                                 
-                                if (buy_only and order_type == mt5.ORDER_TYPE_BUY) or (sell_only and order_type == mt5.ORDER_TYPE_SELL):
-                                    account = mt5.account_info()
-                                    balance = account.balance
-                                    risk_amount = balance / 10
+                            info_tick = mt5.symbol_info_tick(symbol)
+                            order_type = None
+                            entry = 0
+                            stop_loss = 0
+                            atr = df['atr'].iloc[-2]
+                            
+                            match signal:
+                                case 0:
+                                    order_type = mt5.ORDER_TYPE_BUY
+                                    entry = info_tick.ask
+                                    stop_loss = entry - atr * 5
+                                case 1:
+                                    order_type = mt5.ORDER_TYPE_SELL
+                                    entry = info_tick.bid
+                                    stop_loss = entry + atr * 5
 
-                                    price_difference = abs(entry - stop_loss)
-                                    trade_volume = risk_amount / price_difference
+                            account = mt5.account_info()
+                            balance = account.balance
+                            risk_amount = balance / 10
 
-                                    if watchlist[symbol]['unit_factor'] != 0:
-                                        trade_volume = int(trade_volume)
-                                        trade_volume = trade_volume / watchlist[symbol]['unit_factor']
+                            price_difference = abs(entry - stop_loss)
+                            trade_volume = risk_amount / price_difference
 
-                                    watchlist[symbol]['position']['price_difference'] = price_difference
+                            if watchlist[symbol]['unit_factor'] != 0:
+                                trade_volume = int(trade_volume)
+                                trade_volume = trade_volume / watchlist[symbol]['unit_factor']
 
-                                    match signal:
-                                        case 0:
-                                            watchlist[symbol]['position']['take_profit'] = entry + price_difference
-                                        case 1:
-                                            watchlist[symbol]['position']['take_profit'] = entry - price_difference
+                            watchlist[symbol]['position']['price_difference'] = price_difference
 
-                                    minimum_volume = 0.01
-                                    trade_volume = round(trade_volume, 2) if trade_volume >= minimum_volume else minimum_volume
+                            match signal:
+                                case 0:
+                                    watchlist[symbol]['position']['take_profit'] = entry + price_difference
+                                case 1:
+                                    watchlist[symbol]['position']['take_profit'] = entry - price_difference
 
-                                    request = {
-                                        'action': mt5.TRADE_ACTION_DEAL,
-                                        'symbol': symbol,
-                                        'deviation': 10,
-                                        'type': order_type,
-                                        'volume': trade_volume,
-                                        'price': entry,
-                                        'sl': stop_loss,
-                                    }
-                                    print(symbol, trade_volume)
-                                    print(request)
-                                    print()
+                            minimum_volume = 0.01
+                            trade_volume = round(trade_volume, 2) if trade_volume >= minimum_volume else minimum_volume
 
-                                    result = mt5.order_send(request)
-                                    if not result.retcode == 10009:
-                                        print(result)
-                                        return
+                            request = {
+                                'action': mt5.TRADE_ACTION_DEAL,
+                                'symbol': symbol,
+                                'deviation': 10,
+                                'type': order_type,
+                                'volume': trade_volume,
+                                'price': entry,
+                                'sl': stop_loss,
+                            }
+                            print(symbol, trade_volume)
+                            print(request)
+                            print()
+
+                            result = mt5.order_send(request)
+                            if not result.retcode == 10009:
+                                print(result)
+                                return
 
                 watchlist[symbol]['next_search_signal_time'] = datetime.now() + timedelta(minutes=timeframe)
 
