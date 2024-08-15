@@ -148,17 +148,17 @@
     </property>
     <item>
      <property name="text">
-      <string>1M</string>
+      <string>1m</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>5M</string>
+      <string>5m</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>15M</string>
+      <string>15m</string>
      </property>
     </item>
    </widget>

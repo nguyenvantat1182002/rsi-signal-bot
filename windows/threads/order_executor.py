@@ -15,9 +15,9 @@ class OrderExecutorThread(BaseThread):
         super().__init__(rw_lock)
 
         self.timeframe_mapping = {
-            '1M': mt5.TIMEFRAME_M1,
-            '5M': mt5.TIMEFRAME_M5,
-            '15M': mt5.TIMEFRAME_M15
+            '1m': mt5.TIMEFRAME_M1,
+            '5m': mt5.TIMEFRAME_M5,
+            '15m': mt5.TIMEFRAME_M15
         }
 
     def check_buy_sell_condition(self, symbol: int) -> int:
@@ -29,9 +29,18 @@ class OrderExecutorThread(BaseThread):
         prev_candle = df.iloc[0]
         current_candle = df.iloc[-1]
 
-        if current_candle['low'] < prev_candle['low'] and current_candle['close'] > prev_candle['low']:
+        # Get premium and discount
+        pivot = (prev_candle['high'] + prev_candle['low']) // 2
+        is_at_low = current_candle['close'] < pivot
+        is_at_high = current_candle['close'] > pivot
+
+        # Swept high, low liquidity
+        low_level_swept = current_candle['low'] < prev_candle['low'] and current_candle['close'] > prev_candle['low']
+        high_level_swept = current_candle['high'] > prev_candle['high'] and current_candle['close'] < prev_candle['high']
+
+        if is_at_low and low_level_swept:
             return 0
-        elif current_candle['high'] > prev_candle['high'] and current_candle['close'] < prev_candle['high']:
+        elif is_at_high and high_level_swept:
             return 1
         
         return 2
