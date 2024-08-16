@@ -40,6 +40,7 @@ class EditWindow(QMainWindow):
             self.setWindowTitle(f'{self.strategy_config.symbol} - EDIT')
             self.lineEdit.setText(self.strategy_config.symbol)
             self.comboBox.setCurrentText(self.strategy_config.timeframe)
+            self.comboBox_2.setCurrentText(self.strategy_config.timeframe_filter)
             self.spinBox.setValue(self.strategy_config.risk_amount)
             self.checkBox.setChecked(self.strategy_config.auto)
             self.checkBox_2.setChecked(self.strategy_config.buy_only)
@@ -70,6 +71,7 @@ class EditWindow(QMainWindow):
         params = {
             'symbol': self.lineEdit.text(),
             'timeframe': self.comboBox.currentText(),
+            'timeframe_filter': self.comboBox_2.currentText(),
             'risk_amount': self.spinBox.value(),
             'unit_factor': self.spinBox_3.value(),
             'auto': self.checkBox.isChecked(),

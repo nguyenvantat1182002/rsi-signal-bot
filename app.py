@@ -8,8 +8,8 @@ import time
 from datetime import datetime, timedelta
 
 
-def check_buy_sell_conditions(symbol: str) -> int:
-    rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_D1, 0, 2)
+def check_buy_sell_condition(symbol: int) -> int:
+    rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_H4, 0, 2)
 
     df = pd.DataFrame(rates)
     df['time'] = pd.to_datetime(df['time'], unit='s')
@@ -17,18 +17,15 @@ def check_buy_sell_conditions(symbol: str) -> int:
     prev_candle = df.iloc[0]
     current_candle = df.iloc[-1]
 
-    # Get premium and discount
-    pivot = (prev_candle['high'] + prev_candle['low']) // 2
-    is_at_low = current_candle['close'] < pivot
-    is_at_high = current_candle['close'] > pivot
-
-    # Swept high, low liquidity
     low_level_swept = current_candle['low'] < prev_candle['low'] and current_candle['close'] > prev_candle['low']
     high_level_swept = current_candle['high'] > prev_candle['high'] and current_candle['close'] < prev_candle['high']
 
-    if is_at_low and low_level_swept:
+    is_bullish_reversal = (current_candle['close'] < prev_candle['close']) or (current_candle['close'] < prev_candle['open'])
+    is_bearish_reversal = (current_candle['close'] > prev_candle['open']) or (current_candle['close'] > prev_candle['close'])
+
+    if low_level_swept and is_bullish_reversal:
         return 0
-    elif is_at_high and high_level_swept:
+    elif high_level_swept and is_bearish_reversal:
         return 1
     
     return 2
@@ -133,14 +130,14 @@ def main():
                 
                 df = create_data_frame(symbol, timeframe)
 
-                result = detector.detect_divergence(df)
+                result = detector.detect_divergence(df, 5)
                 if result:
                     divergence_time = result[-1][-1][0]
                     
                     if divergence_time != watchlist[symbol]['divergence_time']:
                         watchlist[symbol]['divergence_time'] = divergence_time
 
-                        condition = check_buy_sell_conditions(symbol)
+                        condition = check_buy_sell_condition(symbol)
                         watchlist[symbol]['buy_only'] = condition == 0
                         watchlist[symbol]['sell_only'] = condition == 1
 

@@ -11,6 +11,7 @@ class Position(BaseModel):
 class TradingStrategyConfig(BaseModel):
     symbol: str
     timeframe: str
+    timeframe_filter: str
     risk_amount: int = 10
     unit_factor: int = 0
     auto: bool = True

@@ -18,7 +18,7 @@ class ProfitProtectionThread(BaseThread):
                 for position in positions:
                     symbol = position.symbol
 
-                    if symbol in config:
+                    if symbol in config and config[symbol]['position']:
                         strategy_config = TradingStrategyConfig(symbol=symbol, **config[symbol])
                         price_difference = strategy_config.position.price_difference
                         take_profit = strategy_config.position.take_profit
