@@ -59,16 +59,10 @@ def is_bullish_divergence(df: pd.DataFrame, current_pivot_low: pd.Series) -> Opt
 
 def detect_divergence(df: pd.DataFrame, window_size: int = 3) -> list:
     df = df.copy()
+    df = df.tail(150)
     
-    df['rsi'] = ta.rsi(df['close'], 14)
-    df['atr'] = ta.atr(df['high'], df['low'], df['close'], 14)
-
-    df.dropna(inplace=True)
-
     df['rsi_pivot_high'] = df['rsi'] == df['rsi'].rolling(2 * window_size + 1, center=True).max()
     df['rsi_pivot_low'] = df['rsi'] == df['rsi'].rolling(2 * window_size + 1, center=True).min()
-
-    df = df.tail(150)
 
     current_pivot_low = df[df['rsi_pivot_low']].iloc[-1]
     bullish_divergence_point = is_bullish_divergence(df, current_pivot_low)

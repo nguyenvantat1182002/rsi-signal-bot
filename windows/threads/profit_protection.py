@@ -26,7 +26,8 @@ class ProfitProtectionThread(BaseThread):
                         price_current = position.price_current
                         request = {
                             'action': mt5.TRADE_ACTION_SLTP,
-                            'position': position.ticket
+                            'position': position.ticket,
+                            'tp': position.tp
                         }
 
                         match position.type:

@@ -22,6 +22,7 @@ class TradingStrategyConfig(BaseModel):
     next_search_signal_time: datetime = Field(default_factory=datetime.now)
     position: Optional[Position] = None
     divergence_time: Optional[datetime] = None
+    noti_telegram: bool = False
 
     @field_validator('symbol')
     def symbol_is_not_empty(cls, value: str):

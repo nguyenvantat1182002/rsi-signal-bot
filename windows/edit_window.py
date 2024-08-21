@@ -45,6 +45,7 @@ class EditWindow(QMainWindow):
             self.checkBox.setChecked(self.strategy_config.auto)
             self.checkBox_2.setChecked(self.strategy_config.buy_only)
             self.checkBox_3.setChecked(self.strategy_config.sell_only)
+            self.checkBox_4.setChecked(self.strategy_config.noti_telegram)
             self.spinBox_2.setValue(strategy_config.max_total_orders)
             self.spinBox_3.setValue(strategy_config.unit_factor)
 
@@ -78,6 +79,7 @@ class EditWindow(QMainWindow):
             'max_total_orders': self.spinBox_2.value(),
             'buy_only': self.checkBox_2.isChecked(),
             'sell_only': self.checkBox_3.isChecked(),
+            'noti_telegram': self.checkBox_4.isChecked()
         }
 
         config_manager = JsonFileManager('config.json', self.rw_lock)

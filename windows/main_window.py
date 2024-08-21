@@ -64,10 +64,10 @@ class MainWindow(QMainWindow):
             self.tableWidget.setItem(row, 0, QTableWidgetItem(key))
             self.tableWidget.setItem(row, 1, QTableWidgetItem(value['timeframe']))
 
-            for index, text, func in button_actions:
+            for index, text, action in button_actions:
                 button = QPushButton(text)
                 button.setCursor(Qt.CursorShape.PointingHandCursor)
-                button.clicked.connect(func)
+                button.clicked.connect(action)
 
                 if index == 2 and value['is_running']:
                     button.setText('Dừng')
