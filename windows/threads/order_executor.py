@@ -170,6 +170,11 @@ class OrderExecutorThread(BaseThread):
 
                                 result = mt5.order_send(request)
                                 
+                                if not result.retcode == 10009:
+                                    print(result)
+                                    print('Stop')
+                                    return
+                                
                                 if strategy_config.noti_telegram:
                                     with open('me.session', encoding='utf-8') as file:
                                         session = file.read()
@@ -183,14 +188,9 @@ class OrderExecutorThread(BaseThread):
                                         dialog: Dialog = dialog[0]
                                         entity = dialog.entity
             
-                                        position = mt5.positions_get(symbol=strategy_config.symbol)[0]
+                                        position = mt5.positions_get(ticket=result.order)[0]
                                         message = f'{strategy_config.symbol} {self.order_type_mapping[order_type]}\nSL: {position.sl}'
                                         client.send_message(entity, message)
-
-                                if not result.retcode == 10009:
-                                    print(result)
-                                    print('Stop')
-                                    return
 
                             print()
 
