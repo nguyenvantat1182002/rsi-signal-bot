@@ -8,13 +8,13 @@
         "max_total_orders": 10,
         "buy_only": true,
         "sell_only": true,
-        "is_running": true,
-        "next_search_signal_time": "2024-08-22T23:15:47.317692",
+        "is_running": false,
+        "next_search_signal_time": "2024-08-24T14:50:13.005282",
         "position": {
-            "price_difference": 866.6727784505347,
-            "take_profit": 60542.13555690107
+            "price_difference": 412.20903787877614,
+            "take_profit": 60456.290962121224
         },
-        "divergence_time": "2024-08-22T15:50:00",
+        "divergence_time": "2024-08-23T22:30:00",
         "noti_telegram": true
     },
     "XAUUSD": {
@@ -26,13 +26,13 @@
         "max_total_orders": 10,
         "buy_only": true,
         "sell_only": true,
-        "is_running": true,
-        "next_search_signal_time": "2024-08-22T23:15:48.334670",
+        "is_running": false,
+        "next_search_signal_time": "2024-08-24T14:49:57.824381",
         "position": {
-            "price_difference": 8.738669965677673,
-            "take_profit": 2492.632660068645
+            "price_difference": 9.68817459823822,
+            "take_profit": 2486.510825401762
         },
-        "divergence_time": "2024-08-22T13:45:00",
+        "divergence_time": "2024-08-23T15:25:00",
         "noti_telegram": true
     },
     "EURUSD": {
@@ -44,13 +44,13 @@
         "max_total_orders": 10,
         "buy_only": true,
         "sell_only": true,
-        "is_running": true,
-        "next_search_signal_time": "2024-08-22T23:15:57.402694",
+        "is_running": false,
+        "next_search_signal_time": "2024-08-24T14:49:58.834810",
         "position": {
-            "price_difference": 0.0007236358391056186,
-            "take_profit": 1.116400907517317
+            "price_difference": 0.0023977383477651326,
+            "take_profit": 1.1171022616522348
         },
-        "divergence_time": "2024-08-22T12:30:00",
+        "divergence_time": "2024-08-23T18:15:00",
         "noti_telegram": true
     },
     "GBPUSD": {
@@ -62,13 +62,13 @@
         "max_total_orders": 10,
         "buy_only": true,
         "sell_only": true,
-        "is_running": true,
-        "next_search_signal_time": "2024-08-22T23:16:06.501858",
+        "is_running": false,
+        "next_search_signal_time": "2024-08-24T14:49:59.842915",
         "position": {
-            "price_difference": 0.003669787320944584,
-            "take_profit": 1.3067202126790554
+            "price_difference": 0.0021389341626625313,
+            "take_profit": 1.3101610658373375
         },
-        "divergence_time": "2024-08-22T15:45:00",
+        "divergence_time": "2024-08-23T15:15:00",
         "noti_telegram": true
     },
     "AUDUSD": {
@@ -80,13 +80,13 @@
         "max_total_orders": 10,
         "buy_only": true,
         "sell_only": true,
-        "is_running": true,
-        "next_search_signal_time": "2024-08-22T23:16:07.522351",
+        "is_running": false,
+        "next_search_signal_time": "2024-08-24T14:50:00.859014",
         "position": {
-            "price_difference": 0.0014691398233831476,
-            "take_profit": 0.6745091398233831
+            "price_difference": 0.0013395318744767737,
+            "take_profit": 0.6731190637489536
         },
-        "divergence_time": "2024-08-22T12:30:00",
+        "divergence_time": "2024-08-23T18:15:00",
         "noti_telegram": true
     },
     "NZDUSD": {
@@ -98,13 +98,13 @@
         "max_total_orders": 10,
         "buy_only": true,
         "sell_only": true,
-        "is_running": true,
-        "next_search_signal_time": "2024-08-22T23:16:08.537163",
+        "is_running": false,
+        "next_search_signal_time": "2024-08-24T14:50:01.875079",
         "position": {
-            "price_difference": 0.0010483984275595493,
-            "take_profit": 0.6129048047173213
+            "price_difference": 0.0010154640072643772,
+            "take_profit": 0.6146645359927356
         },
-        "divergence_time": "2024-08-22T14:20:00",
+        "divergence_time": "2024-08-23T20:20:00",
         "noti_telegram": true
     },
     "ETHUSD": {
@@ -116,13 +116,13 @@
         "max_total_orders": 10,
         "buy_only": true,
         "sell_only": true,
-        "is_running": true,
-        "next_search_signal_time": "2024-08-22T23:16:09.571346",
+        "is_running": false,
+        "next_search_signal_time": "2024-08-24T14:50:10.977429",
         "position": {
-            "price_difference": 20.71138396415472,
-            "take_profit": 2574.6058481075356
+            "price_difference": 18.718910975488143,
+            "take_profit": 2775.758910975488
         },
-        "divergence_time": "2024-08-22T15:45:00",
+        "divergence_time": "2024-08-24T05:00:00",
         "noti_telegram": true
     }
 }

@@ -50,8 +50,6 @@ class EditWindow(QMainWindow):
             self.spinBox_3.setValue(strategy_config.unit_factor)
 
     def lineEdit_textChanged(self, value: str):
-        self.lineEdit.setText(value.upper())
-
         unit_factor = 0
         if value.startswith('BTC'):
             unit_factor = 0
