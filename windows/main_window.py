@@ -2,8 +2,8 @@ import os
 
 from .edit_window import EditWindow
 from typing import List
-from windows.threads import OrderExecutorThread, ProfitProtectionThread
-from windows.models import TradingStrategyConfig, JsonFileManager
+from windows.threads import OrderExecutorThread, ProfitProtectionThread, BlanceProtectionThread
+from windows.models import TradingStrategyConfig, Config
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QPushButton
 from PyQt5.QtCore import Qt, QFileSystemWatcher, QReadWriteLock
@@ -15,18 +15,20 @@ class MainWindow(QMainWindow):
         super().__init__()
         uic.loadUi(os.path.join(os.getcwd(), 'ui', 'MainWindow.ui'), self)
 
+        self.setWindowTitle('TRADER 3')
+        
         self.pushButton.clicked.connect(self.pushButton_clicked)
         self.pushButton_2.clicked.connect(self.pushButton_2_clicked)
 
         self.rw_lock = QReadWriteLock()
-        self.config_manager = JsonFileManager('config.json', self.rw_lock)
+        self.config = Config(self.rw_lock)
         self.edit_window = None
 
         file_watcher = QFileSystemWatcher(self)
         file_watcher.fileChanged.connect(self.on_file_changed)
-        file_watcher.addPath(self.config_manager.file_path)
+        file_watcher.addPath(self.config.file_path)
 
-        with self.config_manager.load_and_update_config() as config:
+        with self.config.load_and_update() as config:
             active_symbols = self.get_active_symbols(config)
             for symbol in active_symbols:
                 if config[symbol]['is_running']:
@@ -36,9 +38,11 @@ class MainWindow(QMainWindow):
 
         self.order_executor = OrderExecutorThread(self.rw_lock)
         self.profit_protection = ProfitProtectionThread(self.rw_lock)
+        self.blance_protection = BlanceProtectionThread(self.rw_lock)
 
         self.order_executor.start()
         self.profit_protection.start()
+        self.blance_protection.start()
 
     def get_active_symbols(self, config: dict) -> List[str]:
         return [symbol for symbol in config if config[symbol]['is_running']]
@@ -48,7 +52,7 @@ class MainWindow(QMainWindow):
         return self.tableWidget.item(row, 0).text()
 
     def load_table(self):
-        config = self.config_manager.load_config()
+        config = self.config.get()
 
         button_actions = [[2, 'Bắt đầu', self.start_button_clicked],
                           [3, 'Chỉnh sửa', self.edit_button_clicked],
@@ -80,7 +84,7 @@ class MainWindow(QMainWindow):
         symbol = self.get_selected_symbol()
         button: QPushButton = self.sender()
         
-        with self.config_manager.load_and_update_config() as config:
+        with self.config.load_and_update() as config:
             match button.text():
                 case 'Bắt đầu':
                     config[symbol]['is_running'] = True
@@ -98,7 +102,7 @@ class MainWindow(QMainWindow):
                         self.pushButton_2.setText('Bắt đầu')
 
     def edit_button_clicked(self):
-        config = self.config_manager.load_config()
+        config = self.config.get()
         symbol = self.get_selected_symbol()
         strategy_config = TradingStrategyConfig(
             symbol=symbol,
@@ -108,7 +112,7 @@ class MainWindow(QMainWindow):
         self.edit_window.show()
 
     def remove_button_clicked(self):
-        with self.config_manager.load_and_update_config() as config:
+        with self.config.load_and_update() as config:
             symbol = self.get_selected_symbol()
             config.pop(symbol)
         
@@ -120,7 +124,7 @@ class MainWindow(QMainWindow):
         self.load_table()
 
     def closeEvent(self, _: QCloseEvent):
-        config = self.config_manager.load_config()
+        config = self.config.get()
 
         active_symbols = self.get_active_symbols(config)
 
@@ -128,10 +132,10 @@ class MainWindow(QMainWindow):
             config[symbol]['is_running'] = False
 
         if active_symbols:
-            self.config_manager.update(config)
+            self.config.update(config)
 
     def pushButton_2_clicked(self):
-        with self.config_manager.load_and_update_config() as config:
+        with self.config.load_and_update() as config:
             if not config:
                 return
             

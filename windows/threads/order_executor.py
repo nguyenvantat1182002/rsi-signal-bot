@@ -2,21 +2,12 @@ import MetaTrader5 as mt5
 import pandas as pd
 import detector
 import pandas_ta as ta
-import asyncio
 
-from typing import List
-from telethon.sync import TelegramClient
-from telethon.sessions import StringSession
-from telethon.tl.custom import Dialog
 from typing import Union
 from datetime import datetime, timedelta
 from windows.models import TradingStrategyConfig, Position
 from PyQt5.QtCore import QReadWriteLock, QThread
 from .base import BaseThread
-
-
-API_ID = 11501122
-API_HASH = 'd29b3333c768f6ef6a8167bebc67b2db'
 
 
 class OrderExecutorThread(BaseThread):
@@ -30,10 +21,19 @@ class OrderExecutorThread(BaseThread):
             '4h': mt5.TIMEFRAME_H4,
             '1d': mt5.TIMEFRAME_D1
         }
-        self.order_type_mapping = {
-            mt5.ORDER_TYPE_BUY: 'BUY',
-            mt5.ORDER_TYPE_SELL: 'SELL'
+
+    def get_take_profit_price(self, signal: int, strategy_config: TradingStrategyConfig, entry: Union[int, float]) -> Union[int, float]:
+        price_difference = strategy_config.position.price_difference
+
+        if strategy_config.hedging_mode:
+            price_difference = strategy_config.position.price_difference * strategy_config.risk_reward
+
+        take_profit = {
+            0: entry + price_difference,
+            1: entry - price_difference
         }
+        
+        return take_profit[signal]
 
     def check_buy_sell_condition(self, symbol: int, timeframe: int) -> int:
         rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, 2)
@@ -66,29 +66,20 @@ class OrderExecutorThread(BaseThread):
         df['rsi'] = ta.rsi(df['close'], 14)
         df['atr'] = ta.atr(df['high'], df['low'], df['close'], 14)
 
-        df.set_index(df['time'], inplace=True)
         df.dropna(inplace=True)
         
         return df
 
-    def get_take_profit_price(self, signal: int, position: Position, entry: Union[int, float]) -> Union[int, float]:
-        take_profit = entry + position.price_difference
-
-        if signal == 1:
-            take_profit = entry - position.price_difference
-        
-        return take_profit
-    
-    def determine_order_parameters(self, df: pd.DataFrame, signal: int, info_tick: mt5.Tick):
+    def determine_order_parameters(self, df: pd.DataFrame, signal: int, info_tick: mt5.Tick, strategy_config: TradingStrategyConfig):
         atr = df['atr'].iloc[-2]
         order_type = mt5.ORDER_TYPE_BUY
         entry = info_tick.ask
-        stop_loss = entry - atr * 5
+        stop_loss = entry - atr * strategy_config.atr_multiplier
 
         if signal == 1:
             order_type = mt5.ORDER_TYPE_SELL
             entry = info_tick.bid
-            stop_loss = entry + atr * 5
+            stop_loss = entry + atr * strategy_config.atr_multiplier
             
         return order_type, entry, stop_loss
 
@@ -100,27 +91,10 @@ class OrderExecutorThread(BaseThread):
             risk_amount = account.balance / strategy_config.max_total_orders
 
         return risk_amount
-
-    def get_trade_volume(self,
-                         strategy_config: TradingStrategyConfig,
-                         entry: Union[int, float],
-                         stop_loss: Union[int, float],
-                         risk_amount: Union[int, float]) -> float:
-        price_difference = abs(entry - stop_loss)
-        trade_volume = risk_amount / price_difference
-
-        if strategy_config.unit_factor != 0:
-            trade_volume = int(trade_volume)
-            trade_volume = trade_volume / strategy_config.unit_factor
-
-        minimum_volume = 0.01
-        trade_volume = round(trade_volume, 2) if trade_volume >= minimum_volume else minimum_volume
-
-        return price_difference, trade_volume
-
+    
     def run(self):
         while 1:
-            config = self.config_manager.load_config()
+            config = self.config.get()
             
             for key, value in config.items():
                 strategy_config = TradingStrategyConfig(symbol=key, **value)
@@ -141,22 +115,27 @@ class OrderExecutorThread(BaseThread):
                             for item in result:
                                 print(item)
                             print(strategy_config.symbol)
+
+                            buy_only = True
+                            sell_only = True
                             
-                            condition = self.check_buy_sell_condition(strategy_config.symbol, self.timeframe_mapping[strategy_config.timeframe_filter])
-                            buy_only = strategy_config.buy_only and condition == 0
-                            sell_only = strategy_config.sell_only and condition == 1
-                            
+                            if not strategy_config.hedging_mode:
+                                condition = self.check_buy_sell_condition(strategy_config.symbol, self.timeframe_mapping[strategy_config.timeframe_filter])
+                                buy_only =  strategy_config.buy_only and condition == 0
+                                sell_only =  strategy_config.sell_only and condition == 1
+
                             if ((signal == 0 and buy_only) or (signal == 1 and sell_only)) and not mt5.positions_get(symbol=strategy_config.symbol):
                                 info_tick = mt5.symbol_info_tick(strategy_config.symbol)
 
-                                order_type, entry, stop_loss = self.determine_order_parameters(df, signal, info_tick)
+                                order_type, entry, stop_loss = self.determine_order_parameters(df, signal, info_tick, strategy_config)
                                 risk_amount = self.get_risk_amount(strategy_config)
                                 price_difference, trade_volume = self.get_trade_volume(strategy_config, entry, stop_loss, risk_amount)
 
                                 strategy_config.position = Position()
                                 strategy_config.position.price_difference = price_difference
-                                strategy_config.position.take_profit = self.get_take_profit_price(signal, strategy_config.position, entry)
-                                
+                                strategy_config.position.stop_loss = stop_loss
+                                strategy_config.position.take_profit = self.get_take_profit_price(signal, strategy_config, entry)
+
                                 request = {
                                     'action': mt5.TRADE_ACTION_DEAL,
                                     'symbol': strategy_config.symbol,
@@ -164,41 +143,32 @@ class OrderExecutorThread(BaseThread):
                                     'type': order_type,
                                     'volume': trade_volume,
                                     'price': entry,
-                                    'sl': stop_loss,
                                 }
+
+                                if not strategy_config.hedging_mode:
+                                    request.update({'sl': stop_loss})
+                                else:
+                                    request.update({'volume': strategy_config.hedge_volume})
+
                                 print(request)
 
                                 result = mt5.order_send(request)
-                                
                                 if not result.retcode == 10009:
                                     print(result)
-                                    print('Stop')
+                                    print(__class__.__name__ + ':', 'Stop')
                                     return
                                 
-                                if strategy_config.noti_telegram:
-                                    with open('me.session', encoding='utf-8') as file:
-                                        session = file.read()
-
-                                    new_loop = asyncio.new_event_loop()
-                                    asyncio.set_event_loop(new_loop)
-
-                                    with TelegramClient(StringSession(session), API_ID, API_HASH, loop=new_loop) as client:
-                                        dialogs: List[Dialog] = client.get_dialogs()
-                                        dialog = [dialog for dialog in dialogs if dialog.name == 'TRADER 2']
-                                        dialog: Dialog = dialog[0]
-                                        entity = dialog.entity
-            
-                                        position = mt5.positions_get(ticket=result.order)[0]
-                                        message = f'{strategy_config.symbol} {self.order_type_mapping[order_type]}\nSL: {position.sl}'
-                                        client.send_message(entity, message)
-
                             print()
+
+                    if not mt5.positions_get(symbol=strategy_config.symbol) and strategy_config.position:
+                        strategy_config.position = None
 
                     strategy_config.next_search_signal_time = datetime.now() + timedelta(minutes=timeframe)
 
-                    config.update({strategy_config.symbol: strategy_config.model_dump(exclude='symbol')})
-
-                    self.config_manager.update(config)
+                    config.update({
+                        strategy_config.symbol: strategy_config.model_dump(exclude='symbol')
+                    })
+                    self.config.update(config)
 
                 QThread.msleep(1000)
 

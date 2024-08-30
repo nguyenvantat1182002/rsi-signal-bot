@@ -3,7 +3,7 @@ import MetaTrader5 as mt5
 
 from pydantic import ValidationError
 from typing import Optional
-from windows.models import TradingStrategyConfig, JsonFileManager
+from windows.models import TradingStrategyConfig, Config
 from functools import lru_cache
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow, QCompleter, QMessageBox
@@ -27,6 +27,7 @@ class EditWindow(QMainWindow):
         
         self.lineEdit.textChanged.connect(self.lineEdit_textChanged)
         self.checkBox.stateChanged.connect(self.checkBox_stateChanged)
+        self.checkBox_5.stateChanged.connect(self.checkBox_5_stateChanged)
         self.pushButton.clicked.connect(self.pushButton_clicked)
 
         self.symbols_model  = QStandardItemModel()
@@ -45,9 +46,35 @@ class EditWindow(QMainWindow):
             self.checkBox.setChecked(self.strategy_config.auto)
             self.checkBox_2.setChecked(self.strategy_config.buy_only)
             self.checkBox_3.setChecked(self.strategy_config.sell_only)
-            self.checkBox_4.setChecked(self.strategy_config.noti_telegram)
             self.spinBox_2.setValue(strategy_config.max_total_orders)
             self.spinBox_3.setValue(strategy_config.unit_factor)
+            self.checkBox_5.setChecked(self.strategy_config.hedging_mode)
+            self.doubleSpinBox.setValue(self.strategy_config.hedge_volume)
+            self.spinBox_4.setValue(self.strategy_config.atr_multiplier)
+            self.doubleSpinBox_2.setValue(self.strategy_config.risk_reward)
+
+    def checkBox_5_stateChanged(self):
+        value: bool = self.checkBox_5.isChecked()
+        self.label_5.setEnabled(value)
+        self.doubleSpinBox.setEnabled(value)
+        self.label_7.setEnabled(value)
+        self.doubleSpinBox_2.setEnabled(value)
+
+        self.label.setEnabled(not value)
+        self.spinBox.setEnabled(not value)
+        self.label_3.setEnabled(not value)
+        self.spinBox_3.setEnabled(not value)
+        self.checkBox.setEnabled(not value)
+        self.label_2.setEnabled(not value)
+        self.spinBox_2.setEnabled(not value)
+        self.label_4.setEnabled(not value)
+        self.comboBox_2.setEnabled(not value)
+        self.checkBox_2.setEnabled(not value)
+        self.checkBox_3.setEnabled(not value)
+
+        if not value and self.checkBox.isChecked():
+            self.label.setEnabled(False)
+            self.spinBox.setEnabled(False)
 
     def lineEdit_textChanged(self, value: str):
         unit_factor = 0
@@ -77,11 +104,14 @@ class EditWindow(QMainWindow):
             'max_total_orders': self.spinBox_2.value(),
             'buy_only': self.checkBox_2.isChecked(),
             'sell_only': self.checkBox_3.isChecked(),
-            'noti_telegram': self.checkBox_4.isChecked()
+            'hedging_mode': self.checkBox_5.isChecked(),
+            'hedge_volume': self.doubleSpinBox.value(),
+            'atr_multiplier': self.spinBox_4.value(),
+            'risk_reward': self.doubleSpinBox_2.value()
         }
 
-        config_manager = JsonFileManager('config.json', self.rw_lock)
-        with config_manager.load_and_update_config() as config:
+        config = Config(self.rw_lock)
+        with config.load_and_update() as config:
             try:
                 strategy_config = TradingStrategyConfig(**params)
 
@@ -90,7 +120,9 @@ class EditWindow(QMainWindow):
                     strategy_config.next_search_signal_time = self.strategy_config.next_search_signal_time
                     strategy_config.position = self.strategy_config.position
 
-                config.update({strategy_config.symbol: strategy_config.model_dump(exclude='symbol')})
+                config.update({
+                    strategy_config.symbol: strategy_config.model_dump(exclude='symbol')
+                })
             except ValidationError as ex:
                 QMessageBox.critical(self, 'Thông báo', ex.errors()[0]['msg'])
             

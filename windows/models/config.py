@@ -12,12 +12,12 @@ def serialize_date_to_iso(o):
         return o.isoformat()
 
 
-class JsonFileManager:
-    def __init__(self, file_name: str, rw_lock: QReadWriteLock):
-        self.file_path = os.path.join(os.getcwd(), file_name)
+class Config:
+    def __init__(self, rw_lock: QReadWriteLock):
+        self.file_path = os.path.join(os.getcwd(), 'config.json')
         self.rw_lock = rw_lock
 
-    def load_config(self) -> dict:
+    def get(self) -> dict:
         self.rw_lock.lockForRead()
         try:
             config = {}
@@ -31,7 +31,7 @@ class JsonFileManager:
             self.rw_lock.unlock()
 
     @contextmanager
-    def load_and_update_config(self) -> Generator[dict, None, None]:
+    def load_and_update(self) -> Generator[dict, None, None]:
         config = {}
 
         self.rw_lock.lockForRead()
@@ -43,7 +43,8 @@ class JsonFileManager:
             yield config
         finally:
             self.rw_lock.unlock()
-            self.update(config)
+            
+        self.update(config)
     
     def update(self, data: dict):
         self.rw_lock.lockForWrite()

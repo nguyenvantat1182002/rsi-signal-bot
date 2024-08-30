@@ -1,128 +1,92 @@
 {
     "BTCUSD": {
-        "timeframe": "5m",
-        "timeframe_filter": "4h",
-        "risk_amount": 100,
+        "timeframe": "1m",
+        "timeframe_filter": "15m",
+        "risk_amount": 10,
         "unit_factor": 0,
-        "auto": false,
+        "auto": true,
         "max_total_orders": 10,
         "buy_only": true,
         "sell_only": true,
-        "is_running": false,
-        "next_search_signal_time": "2024-08-24T14:50:13.005282",
-        "position": {
-            "price_difference": 412.20903787877614,
-            "take_profit": 60456.290962121224
-        },
-        "divergence_time": "2024-08-23T22:30:00",
-        "noti_telegram": true
+        "is_running": true,
+        "next_search_signal_time": "2024-08-30T13:46:32.247484",
+        "position": null,
+        "divergence_time": "2024-08-30T06:26:00",
+        "hedging_mode": true,
+        "hedge_volume": 0.01,
+        "atr_multiplier": 5,
+        "risk_reward": 2.0
     },
     "XAUUSD": {
-        "timeframe": "5m",
-        "timeframe_filter": "4h",
-        "risk_amount": 100,
+        "timeframe": "1m",
+        "timeframe_filter": "15m",
+        "risk_amount": 10,
         "unit_factor": 100,
-        "auto": false,
+        "auto": true,
         "max_total_orders": 10,
         "buy_only": true,
         "sell_only": true,
-        "is_running": false,
-        "next_search_signal_time": "2024-08-24T14:49:57.824381",
-        "position": {
-            "price_difference": 9.68817459823822,
-            "take_profit": 2486.510825401762
-        },
-        "divergence_time": "2024-08-23T15:25:00",
-        "noti_telegram": true
+        "is_running": true,
+        "next_search_signal_time": "2024-08-30T13:46:33.273438",
+        "position": null,
+        "divergence_time": "2024-08-30T06:17:00",
+        "hedging_mode": true,
+        "hedge_volume": 0.01,
+        "atr_multiplier": 5,
+        "risk_reward": 2.0
     },
     "EURUSD": {
-        "timeframe": "5m",
-        "timeframe_filter": "4h",
-        "risk_amount": 100,
+        "timeframe": "1m",
+        "timeframe_filter": "15m",
+        "risk_amount": 10,
         "unit_factor": 100000,
         "auto": false,
         "max_total_orders": 10,
         "buy_only": true,
         "sell_only": true,
-        "is_running": false,
-        "next_search_signal_time": "2024-08-24T14:49:58.834810",
-        "position": {
-            "price_difference": 0.0023977383477651326,
-            "take_profit": 1.1171022616522348
-        },
-        "divergence_time": "2024-08-23T18:15:00",
-        "noti_telegram": true
+        "is_running": true,
+        "next_search_signal_time": "2024-08-30T13:46:34.302529",
+        "position": null,
+        "divergence_time": "2024-08-30T06:15:00",
+        "hedging_mode": true,
+        "hedge_volume": 0.01,
+        "atr_multiplier": 5,
+        "risk_reward": 2.0
     },
     "GBPUSD": {
-        "timeframe": "5m",
-        "timeframe_filter": "4h",
-        "risk_amount": 100,
+        "timeframe": "1m",
+        "timeframe_filter": "15m",
+        "risk_amount": 10,
         "unit_factor": 100000,
-        "auto": false,
+        "auto": true,
         "max_total_orders": 10,
         "buy_only": true,
         "sell_only": true,
-        "is_running": false,
-        "next_search_signal_time": "2024-08-24T14:49:59.842915",
-        "position": {
-            "price_difference": 0.0021389341626625313,
-            "take_profit": 1.3101610658373375
-        },
-        "divergence_time": "2024-08-23T15:15:00",
-        "noti_telegram": true
+        "is_running": true,
+        "next_search_signal_time": "2024-08-30T13:46:35.320376",
+        "position": null,
+        "divergence_time": null,
+        "hedging_mode": true,
+        "hedge_volume": 0.01,
+        "atr_multiplier": 5,
+        "risk_reward": 2.0
     },
     "AUDUSD": {
-        "timeframe": "5m",
-        "timeframe_filter": "4h",
-        "risk_amount": 100,
+        "timeframe": "1m",
+        "timeframe_filter": "15m",
+        "risk_amount": 10,
         "unit_factor": 100000,
-        "auto": false,
+        "auto": true,
         "max_total_orders": 10,
         "buy_only": true,
         "sell_only": true,
-        "is_running": false,
-        "next_search_signal_time": "2024-08-24T14:50:00.859014",
-        "position": {
-            "price_difference": 0.0013395318744767737,
-            "take_profit": 0.6731190637489536
-        },
-        "divergence_time": "2024-08-23T18:15:00",
-        "noti_telegram": true
-    },
-    "NZDUSD": {
-        "timeframe": "5m",
-        "timeframe_filter": "4h",
-        "risk_amount": 100,
-        "unit_factor": 100000,
-        "auto": false,
-        "max_total_orders": 10,
-        "buy_only": true,
-        "sell_only": true,
-        "is_running": false,
-        "next_search_signal_time": "2024-08-24T14:50:01.875079",
-        "position": {
-            "price_difference": 0.0010154640072643772,
-            "take_profit": 0.6146645359927356
-        },
-        "divergence_time": "2024-08-23T20:20:00",
-        "noti_telegram": true
-    },
-    "ETHUSD": {
-        "timeframe": "5m",
-        "timeframe_filter": "4h",
-        "risk_amount": 100,
-        "unit_factor": 0,
-        "auto": false,
-        "max_total_orders": 10,
-        "buy_only": true,
-        "sell_only": true,
-        "is_running": false,
-        "next_search_signal_time": "2024-08-24T14:50:10.977429",
-        "position": {
-            "price_difference": 18.718910975488143,
-            "take_profit": 2775.758910975488
-        },
-        "divergence_time": "2024-08-24T05:00:00",
-        "noti_telegram": true
+        "is_running": true,
+        "next_search_signal_time": "2024-08-30T13:46:36.338127",
+        "position": null,
+        "divergence_time": "2024-08-30T05:56:00",
+        "hedging_mode": true,
+        "hedge_volume": 0.01,
+        "atr_multiplier": 5,
+        "risk_reward": 2.0
     }
 }

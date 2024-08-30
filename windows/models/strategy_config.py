@@ -5,6 +5,7 @@ from pydantic import BaseModel, field_validator, Field
 
 class Position(BaseModel):
     price_difference: Union[int, float] = -1
+    stop_loss: Union[int, float] = -1
     take_profit: Union[int, float] = -1
 
 
@@ -22,7 +23,10 @@ class TradingStrategyConfig(BaseModel):
     next_search_signal_time: datetime = Field(default_factory=datetime.now)
     position: Optional[Position] = None
     divergence_time: Optional[datetime] = None
-    noti_telegram: bool = False
+    hedging_mode: bool = False
+    hedge_volume: float = 0.01
+    atr_multiplier: int = 5
+    risk_reward: float = 1.
 
     @field_validator('symbol')
     def symbol_is_not_empty(cls, value: str):
