@@ -69,6 +69,9 @@
     </property>
    </widget>
    <widget class="QCheckBox" name="checkBox">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -317,22 +320,6 @@
      <double>0.010000000000000</double>
     </property>
    </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>220</y>
-      <width>71</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Khối lượng</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
@@ -362,22 +349,6 @@
      <number>5</number>
     </property>
    </widget>
-   <widget class="QLabel" name="label_7">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>220</y>
-      <width>91</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Risk/Reward</string>
-    </property>
-   </widget>
    <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
     <property name="enabled">
      <bool>false</bool>
@@ -401,6 +372,38 @@
     </property>
     <property name="singleStep">
      <double>0.500000000000000</double>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_6">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>220</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="text">
+     <string>Khối lượng</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_7">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>220</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="text">
+     <string>Risk/Reward</string>
     </property>
    </widget>
   </widget>

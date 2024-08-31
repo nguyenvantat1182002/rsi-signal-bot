@@ -24,9 +24,11 @@ class TradingStrategyConfig(BaseModel):
     position: Optional[Position] = None
     divergence_time: Optional[datetime] = None
     hedging_mode: bool = False
-    hedge_volume: float = 0.01
+    default_volume: float = 0.01
     atr_multiplier: int = 5
     risk_reward: float = 1.
+    use_default_volume: bool = False
+    use_risk_reward: bool = False
 
     @field_validator('symbol')
     def symbol_is_not_empty(cls, value: str):

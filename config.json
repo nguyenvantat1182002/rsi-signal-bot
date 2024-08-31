@@ -1,7 +1,7 @@
 {
     "BTCUSD": {
-        "timeframe": "1m",
-        "timeframe_filter": "15m",
+        "timeframe": "5m",
+        "timeframe_filter": "4h",
         "risk_amount": 10,
         "unit_factor": 0,
         "auto": true,
@@ -9,30 +9,14 @@
         "buy_only": true,
         "sell_only": true,
         "is_running": true,
-        "next_search_signal_time": "2024-08-30T13:57:43.929896",
+        "next_search_signal_time": "2024-08-31T13:51:40.054121",
         "position": null,
-        "divergence_time": "2024-08-30T06:26:00",
+        "divergence_time": null,
         "hedging_mode": true,
-        "hedge_volume": 0.01,
-        "atr_multiplier": 5,
-        "risk_reward": 2.0
-    },
-    "XAUUSD": {
-        "timeframe": "1m",
-        "timeframe_filter": "15m",
-        "risk_amount": 10,
-        "unit_factor": 100,
-        "auto": true,
-        "max_total_orders": 10,
-        "buy_only": true,
-        "sell_only": true,
-        "is_running": true,
-        "next_search_signal_time": "2024-08-30T13:57:44.952875",
-        "position": null,
-        "divergence_time": "2024-08-30T06:17:00",
-        "hedging_mode": true,
-        "hedge_volume": 0.01,
-        "atr_multiplier": 5,
-        "risk_reward": 2.0
+        "default_volume": 0.01,
+        "atr_multiplier": 3,
+        "risk_reward": 2.0,
+        "use_default_volume": true,
+        "use_risk_reward": true
     }
 }

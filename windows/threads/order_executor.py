@@ -18,6 +18,7 @@ class OrderExecutorThread(BaseThread):
             '1m': mt5.TIMEFRAME_M1,
             '5m': mt5.TIMEFRAME_M5,
             '15m': mt5.TIMEFRAME_M15,
+            '1h': mt5.TIMEFRAME_H1,
             '4h': mt5.TIMEFRAME_H4,
             '1d': mt5.TIMEFRAME_D1
         }
@@ -25,7 +26,7 @@ class OrderExecutorThread(BaseThread):
     def get_take_profit_price(self, signal: int, strategy_config: TradingStrategyConfig, entry: Union[int, float]) -> Union[int, float]:
         price_difference = strategy_config.position.price_difference
 
-        if strategy_config.hedging_mode:
+        if strategy_config.hedging_mode or strategy_config.use_risk_reward:
             price_difference = strategy_config.position.price_difference * strategy_config.risk_reward
 
         take_profit = {
@@ -116,13 +117,9 @@ class OrderExecutorThread(BaseThread):
                                 print(item)
                             print(strategy_config.symbol)
 
-                            buy_only = True
-                            sell_only = True
-                            
-                            if not strategy_config.hedging_mode:
-                                condition = self.check_buy_sell_condition(strategy_config.symbol, self.timeframe_mapping[strategy_config.timeframe_filter])
-                                buy_only =  strategy_config.buy_only and condition == 0
-                                sell_only =  strategy_config.sell_only and condition == 1
+                            condition = self.check_buy_sell_condition(strategy_config.symbol, self.timeframe_mapping[strategy_config.timeframe_filter])
+                            buy_only = strategy_config.buy_only and condition == 0
+                            sell_only = strategy_config.sell_only and condition == 1
 
                             if ((signal == 0 and buy_only) or (signal == 1 and sell_only)) and not mt5.positions_get(symbol=strategy_config.symbol):
                                 info_tick = mt5.symbol_info_tick(strategy_config.symbol)
@@ -146,9 +143,12 @@ class OrderExecutorThread(BaseThread):
                                 }
 
                                 if not strategy_config.hedging_mode:
+                                    if strategy_config.use_risk_reward:
+                                        request.update({'tp': strategy_config.position.take_profit})
+
                                     request.update({'sl': stop_loss})
-                                else:
-                                    request.update({'volume': strategy_config.hedge_volume})
+                                elif strategy_config.hedging_mode and strategy_config.use_default_volume:
+                                    request.update({'volume': strategy_config.default_volume})
 
                                 print(request)
 
