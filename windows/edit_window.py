@@ -78,6 +78,8 @@ class EditWindow(QMainWindow):
         self.label_2.setEnabled(not value)
         self.spinBox_2.setEnabled(not value)
         self.checkBox.setEnabled(not value)
+        self.label_3.setEnabled(not value)
+        self.spinBox_3.setEnabled(not value)
 
         if not value:
             if self.checkBox.isChecked():
