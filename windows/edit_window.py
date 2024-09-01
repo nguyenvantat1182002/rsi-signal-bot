@@ -62,7 +62,7 @@ class EditWindow(QMainWindow):
         
     def checkBox_7_stateChanged(self):
         value: bool = self.checkBox_7.isChecked()
-        
+
         self.doubleSpinBox_2.setEnabled(value)
 
         if not value and self.checkBox_5.isChecked():
@@ -79,12 +79,13 @@ class EditWindow(QMainWindow):
         self.spinBox_2.setEnabled(not value)
         self.checkBox.setEnabled(not value)
 
-        if not value and self.checkBox.isChecked():
-            self.label.setEnabled(False)
-            self.spinBox.setEnabled(False)
-        elif not value and not self.checkBox.isChecked():
-            self.label_2.setEnabled(False)
-            self.spinBox_2.setEnabled(False)
+        if not value:
+            if self.checkBox.isChecked():
+                self.label.setEnabled(False)
+                self.spinBox.setEnabled(False)
+            else:
+                self.label_2.setEnabled(False)
+                self.spinBox_2.setEnabled(False)
             
     def lineEdit_textChanged(self, value: str):
         unit_factor = 0
