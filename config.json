@@ -1,7 +1,7 @@
 {
     "BTCUSD": {
         "timeframe": "5m",
-        "timeframe_filter": "4h",
+        "timeframe_filter": "1h",
         "risk_amount": 10,
         "unit_factor": 0,
         "auto": true,
@@ -9,7 +9,7 @@
         "buy_only": true,
         "sell_only": true,
         "is_running": true,
-        "next_search_signal_time": "2024-08-31T13:51:40.054121",
+        "next_search_signal_time": "2024-09-01T12:13:19.342153",
         "position": null,
         "divergence_time": null,
         "hedging_mode": true,

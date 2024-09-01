@@ -104,7 +104,7 @@ class OrderExecutorThread(BaseThread):
                     timeframe = self.timeframe_mapping[strategy_config.timeframe]
                     df = self.create_data_frame(strategy_config.symbol, timeframe)
 
-                    result = detector.detect_divergence(df, 5)
+                    result = detector.detect_divergence(df, window_size=5)
                     if result:
                         signal, _, rsi_lines = result
                         signal = signal[-1]
@@ -142,14 +142,15 @@ class OrderExecutorThread(BaseThread):
                                     'price': entry,
                                 }
 
-                                if not strategy_config.hedging_mode:
+                                if strategy_config.hedging_mode:
+                                    if strategy_config.use_default_volume:
+                                        request.update({'volume': strategy_config.default_volume})
+                                else:
                                     if strategy_config.use_risk_reward:
                                         request.update({'tp': strategy_config.position.take_profit})
 
                                     request.update({'sl': stop_loss})
-                                elif strategy_config.hedging_mode and strategy_config.use_default_volume:
-                                    request.update({'volume': strategy_config.default_volume})
-
+                                    
                                 print(request)
 
                                 result = mt5.order_send(request)

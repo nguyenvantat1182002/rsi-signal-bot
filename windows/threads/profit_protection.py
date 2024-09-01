@@ -15,7 +15,7 @@ class ProfitProtectionThread(BaseThread):
 
             for key, value in config.items():
                 positions = mt5.positions_get(symbol=key)
-                positions = list(filter(lambda x: x.sl and not x.tp and value['position'], positions))
+                positions = list(filter(lambda x: x.sl and not x.tp and value['position'], positions if positions else ()))
 
                 for position in positions:
                     strategy_config = TradingStrategyConfig(symbol=key, **value)
