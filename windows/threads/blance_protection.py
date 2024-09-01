@@ -70,8 +70,8 @@ class BlanceProtectionThread(BaseThread):
             config = self.config.get()
             for key, value in config.items():
                 positions = mt5.positions_get(symbol=key)
-                positions = list(filter(lambda x: not x.sl and value['position'], positions))
-                
+                positions = list(filter(lambda x: not x.sl and value['position'], positions if positions else ()))
+
                 if positions:
                     position = positions[-1]
                     strategy_config = TradingStrategyConfig(symbol=key, **value)
