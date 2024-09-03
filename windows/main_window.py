@@ -19,6 +19,7 @@ class MainWindow(QMainWindow):
         
         self.pushButton.clicked.connect(self.pushButton_clicked)
         self.pushButton_2.clicked.connect(self.pushButton_2_clicked)
+        self.checkBox.stateChanged.connect(self.checkBox_stateChanged)
 
         self.rw_lock = QReadWriteLock()
         self.config = Config(self.rw_lock)
@@ -152,3 +153,7 @@ class MainWindow(QMainWindow):
                     self.pushButton_2.setText('Dừng')
                 case 'Dừng':
                     self.pushButton_2.setText('Bắt đầu')
+
+    def checkBox_stateChanged(self):
+        self.order_executor.multiple_pairs = self.checkBox.isChecked()
+        

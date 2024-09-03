@@ -1,6 +1,5 @@
 import MetaTrader5 as mt5
 
-from typing import Union
 from PyQt5.QtCore import QThread
 from windows.models import TradingStrategyConfig
 from PyQt5.QtCore import QReadWriteLock
@@ -10,116 +9,53 @@ from .base import BaseThread
 class BlanceProtectionThread(BaseThread):
     def __init__(self, rw_lock: QReadWriteLock):
         super().__init__(rw_lock)
-
-        self.order_type_mapping = {
-            0: mt5.ORDER_TYPE_SELL,
-            1: mt5.ORDER_TYPE_BUY
-        }
-        self.toggle_mapping = {
-            0: 1,
-            1: 0
-        }
-
-    def get_take_profit_price(self, position: mt5.TradePosition, strategy_config: TradingStrategyConfig, entry: Union[int, float]):
-        take_profit = {
-            0: entry + (strategy_config.position.price_difference * strategy_config.risk_reward),
-            1: entry - (strategy_config.position.price_difference * strategy_config.risk_reward)
-        }
-
-        return take_profit[self.toggle_mapping[position.type]]
-
-    def get_stop_loss_price(self, position: mt5.TradePosition, strategy_config: TradingStrategyConfig, entry: Union[int, float]):
-        stop_loss = {
-            0: entry - strategy_config.position.price_difference,
-            1: entry + strategy_config.position.price_difference
-        }
-
-        return stop_loss[self.toggle_mapping[position.type]]
-
-    def close_all_positions(self, symbol: str):
-        positions = mt5.positions_get(symbol=symbol)
-        info_tick = mt5.symbol_info_tick(symbol)
-
-        price = {
-            0: info_tick.bid,
-            1: info_tick.ask
-        }
-
-        for position in positions:
-            request = dict(
-                action=mt5.TRADE_ACTION_DEAL,
-                type=self.order_type_mapping[position.type],
-                price=price[position.type],
-                symbol=position.symbol,
-                volume=position.volume,
-                position=position.ticket,
-            )
-            mt5.order_send(request)
-
-    def get_entry(self, position: mt5.TradePosition, strategy_config: TradingStrategyConfig):
-        info_tick = mt5.symbol_info_tick(strategy_config.symbol)
-        entry = {
-            0: info_tick.bid,
-            1: info_tick.ask
-        }
-
-        return entry[position.type]
-
+    
     def run(self):
         while 1:
             config = self.config.get()
             for key, value in config.items():
-                positions = mt5.positions_get(symbol=key)
-                positions = list(filter(lambda x: not x.sl and value['position'], positions if positions else ()))
-
-                if positions:
-                    position = positions[-1]
-                    strategy_config = TradingStrategyConfig(symbol=key, **value)
-
-                    if strategy_config.is_running:
-                        stop_loss = strategy_config.position.stop_loss
-                        take_profit = strategy_config.position.take_profit
-                        price_current = position.price_current
+                strategy_config = TradingStrategyConfig(symbol=key, **value)
+                if strategy_config.is_running and strategy_config.hedging_mode:
+                    positions = mt5.positions_get(symbol=key)
+                    if positions:
+                        lastest_position = positions[-1]
                         
-                        if (position.type == 0 and price_current > take_profit) or (position.type == 1 and price_current < take_profit):
-                            # if len(mt5.positions_get(symbol=position.symbol)) > 1:
-                            #     self.close_all_positions(position.symbol)
-                            # else:
-                            #     request = {
-                            #         'action': mt5.TRADE_ACTION_SLTP,
-                            #         'position': position.ticket,
-                            #         'sl': stop_loss
-                            #     }
-                            #     mt5.order_send(request)
+                        if not mt5.orders_get(symbol=key):
+                            entry = strategy_config.position.stop_loss if lastest_position.type == positions[0].type else positions[0].price_open
 
-                            self.close_all_positions(position.symbol)
+                            result = self.create_buy_sell_stop_order(
+                                symbol=strategy_config.symbol,
+                                order_type=self.order_type_mapping[lastest_position.type],
+                                volume=lastest_position.volume * (2 if len(positions) < 3 else 1.5),
+                                price=entry,
+                                take_profit=self.get_take_profit_price(self.toggle_mapping[lastest_position.type], strategy_config, entry)
+                            )
+                            if not result.retcode == 10009:
+                                print(result)
+                                print(__class__.__name__ + ':', 'Stop')
+                                return
                         else:
-                            if (position.type == 0 and price_current <= stop_loss) or (position.type == 1 and price_current >= stop_loss):
-                                entry = self.get_entry(position, strategy_config)
-
-                                strategy_config.position.take_profit = self.get_take_profit_price(position, strategy_config, entry)
-                                strategy_config.position.stop_loss = self.get_stop_loss_price(position, strategy_config, entry)
-    
+                            for item in positions[:-1]:
                                 request = {
-                                    'action': mt5.TRADE_ACTION_DEAL,
-                                    'symbol': strategy_config.symbol,
-                                    'deviation': 10,
-                                    'type': self.order_type_mapping[position.type],
-                                    'volume': position.volume * 2,
-                                    'price': entry,
+                                    'action': mt5.TRADE_ACTION_SLTP,
+                                    'position': item.ticket,
                                 }
-                                result = mt5.order_send(request)
 
-                                config.update({
-                                    strategy_config.symbol: strategy_config.model_dump(exclude='symbol')
-                                })
-                                self.config.update(config)
+                                if (item.type == 0 and lastest_position.type == 0) or (item.type == 1 and lastest_position.type == 1):
+                                    request.update({'tp': lastest_position.tp})
+                                else:
+                                    request.update({'sl': lastest_position.tp})
 
-                                if not result.retcode == 10009:
-                                    print(result)
-                                    print(__class__.__name__ + ':', 'Stop')
-                                    return
+                                mt5.order_send(request)
+                    else:
+                        pending_orders = mt5.orders_get(symbol=key)
+                        for order in pending_orders:
+                            request = {
+                                'action': mt5.TRADE_ACTION_REMOVE,
+                                'order': order.ticket
+                            }
+                            mt5.order_send(request)
 
                 QThread.msleep(1000)
-                
-            QThread.msleep(1000)
+
+            QThread.msleep(5000)

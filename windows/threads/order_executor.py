@@ -14,6 +14,7 @@ class OrderExecutorThread(BaseThread):
     def __init__(self, rw_lock: QReadWriteLock):
         super().__init__(rw_lock)
 
+        self.multiple_pairs = True
         self.timeframe_mapping = {
             '1m': mt5.TIMEFRAME_M1,
             '5m': mt5.TIMEFRAME_M5,
@@ -22,19 +23,6 @@ class OrderExecutorThread(BaseThread):
             '4h': mt5.TIMEFRAME_H4,
             '1d': mt5.TIMEFRAME_D1
         }
-
-    def get_take_profit_price(self, signal: int, strategy_config: TradingStrategyConfig, entry: Union[int, float]) -> Union[int, float]:
-        price_difference = strategy_config.position.price_difference
-
-        if strategy_config.hedging_mode or strategy_config.use_risk_reward:
-            price_difference = strategy_config.position.price_difference * strategy_config.risk_reward
-
-        take_profit = {
-            0: entry + price_difference,
-            1: entry - price_difference
-        }
-        
-        return take_profit[signal]
 
     def check_buy_sell_condition(self, symbol: int, timeframe: int) -> int:
         rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, 2)
@@ -87,9 +75,9 @@ class OrderExecutorThread(BaseThread):
     def get_risk_amount(self, strategy_config: TradingStrategyConfig) -> Union[int, float]:
         risk_amount = strategy_config.risk_amount
 
-        if strategy_config.auto:
+        if strategy_config.risk_type == '%':
             account = mt5.account_info()
-            risk_amount = account.balance / strategy_config.max_total_orders
+            risk_amount = (strategy_config.risk_amount / 100) * account.balance
 
         return risk_amount
     
@@ -116,12 +104,14 @@ class OrderExecutorThread(BaseThread):
                             for item in result:
                                 print(item)
                             print(strategy_config.symbol)
-
+                            
                             condition = self.check_buy_sell_condition(strategy_config.symbol, self.timeframe_mapping[strategy_config.timeframe_filter])
                             buy_only = strategy_config.buy_only and condition == 0
                             sell_only = strategy_config.sell_only and condition == 1
 
-                            if ((signal == 0 and buy_only) or (signal == 1 and sell_only)) and not mt5.positions_get(symbol=strategy_config.symbol):
+                            trading_allowed = False if not self.multiple_pairs and mt5.positions_total() > 0 else True
+
+                            if ((signal == 0 and buy_only) or (signal == 1 and sell_only)) and not mt5.positions_get(symbol=strategy_config.symbol) and trading_allowed:
                                 info_tick = mt5.symbol_info_tick(strategy_config.symbol)
 
                                 order_type, entry, stop_loss = self.determine_order_parameters(df, signal, info_tick, strategy_config)
@@ -134,9 +124,9 @@ class OrderExecutorThread(BaseThread):
                                 strategy_config.position.take_profit = self.get_take_profit_price(signal, strategy_config, entry)
 
                                 request = {
-                                    'action': mt5.TRADE_ACTION_DEAL,
                                     'symbol': strategy_config.symbol,
                                     'deviation': 10,
+                                    'action': mt5.TRADE_ACTION_DEAL,
                                     'type': order_type,
                                     'volume': trade_volume,
                                     'price': entry,
@@ -145,6 +135,8 @@ class OrderExecutorThread(BaseThread):
                                 if strategy_config.hedging_mode:
                                     if strategy_config.use_default_volume:
                                         request.update({'volume': strategy_config.default_volume})
+                                        
+                                    request.update({'tp': strategy_config.position.take_profit})
                                 else:
                                     if strategy_config.use_risk_reward:
                                         request.update({'tp': strategy_config.position.take_profit})
@@ -158,7 +150,7 @@ class OrderExecutorThread(BaseThread):
                                     print(result)
                                     print(__class__.__name__ + ':', 'Stop')
                                     return
-                                
+                                    
                             print()
 
                     if not mt5.positions_get(symbol=strategy_config.symbol) and strategy_config.position:

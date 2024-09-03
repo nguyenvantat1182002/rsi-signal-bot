@@ -210,9 +210,32 @@ def main():
 
 
 if mt5.initialize():
-    t = threading.Thread(target=profit_protection_thread, daemon=True)
-    t.start()
+    # t = threading.Thread(target=profit_protection_thread, daemon=True)
+    # t.start()
     
-    main()
+    # main()
+
+    import detector
+
+    df = create_data_frame('BTCUSD', mt5.TIMEFRAME_M5)
+    result = detector.detect_divergence(df, window_size=5)
+
+    print(result)
+
+    signal, _, rsi_lines = result
+    signal = signal[-1]
+    divergence_time = rsi_lines[-1][0]
+
+    print(divergence_time, type(divergence_time))
+
+    from PyQt5.QtCore import QReadWriteLock
+    from windows.models import Config, TradingStrategyConfig
+
+    config = Config(QReadWriteLock())
+    config = config.get()
+
+    symbol = 'BTCUSD'
+    strategy_config = TradingStrategyConfig(symbol=symbol, **config[symbol])
+    print(strategy_config.divergence_time, type(strategy_config.divergence_time), divergence_time != strategy_config.divergence_time)
 
 mt5.shutdown()

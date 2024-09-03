@@ -13,10 +13,9 @@ class TradingStrategyConfig(BaseModel):
     symbol: str
     timeframe: str
     timeframe_filter: str
-    risk_amount: int = 10
+    risk_amount: float = 10
+    risk_type: str = 'Cash'
     unit_factor: int = 0
-    auto: bool = True
-    max_total_orders: int = 10
     buy_only: bool = True
     sell_only: bool = True
     is_running: bool = False
