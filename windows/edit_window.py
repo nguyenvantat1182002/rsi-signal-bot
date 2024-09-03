@@ -72,8 +72,10 @@ class EditWindow(QMainWindow):
         self.doubleSpinBox.setEnabled(value)
         
         self.label.setEnabled(not value)
-        self.spinBox.setEnabled(not value)
+        self.doubleSpinBox_3.setEnabled(not value)
         self.comboBox_3.setEnabled(not value)
+        self.label_3.setEnabled(not value)
+        self.spinBox_3.setEnabled(not value)
 
     def lineEdit_textChanged(self, value: str):
         unit_factor = 0

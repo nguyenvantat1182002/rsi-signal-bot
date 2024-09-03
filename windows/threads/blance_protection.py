@@ -15,7 +15,7 @@ class BlanceProtectionThread(BaseThread):
             config = self.config.get()
             for key, value in config.items():
                 strategy_config = TradingStrategyConfig(symbol=key, **value)
-                if strategy_config.is_running and strategy_config.hedging_mode:
+                if strategy_config.is_running and strategy_config.hedging_mode and strategy_config.position:
                     positions = mt5.positions_get(symbol=key)
                     if positions:
                         lastest_position = positions[-1]
