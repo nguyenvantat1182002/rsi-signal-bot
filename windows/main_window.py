@@ -2,7 +2,7 @@ import os
 
 from .edit_window import EditWindow
 from typing import List
-from windows.threads import OrderExecutorThread, ProfitProtectionThread, BlanceProtectionThread
+from windows.threads import OrderExecutorThread, BlanceProtectionThread
 from windows.models import TradingStrategyConfig, Config
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QPushButton
@@ -38,11 +38,9 @@ class MainWindow(QMainWindow):
         self.load_table()
 
         self.order_executor = OrderExecutorThread(self.rw_lock)
-        self.profit_protection = ProfitProtectionThread(self.rw_lock)
         self.blance_protection = BlanceProtectionThread(self.rw_lock)
 
         self.order_executor.start()
-        self.profit_protection.start()
         self.blance_protection.start()
 
     def get_active_symbols(self, config: dict) -> List[str]:
@@ -105,9 +103,7 @@ class MainWindow(QMainWindow):
     def edit_button_clicked(self):
         config = self.config.get()
         symbol = self.get_selected_symbol()
-        strategy_config = TradingStrategyConfig(
-            symbol=symbol,
-            **config[symbol])
+        strategy_config = TradingStrategyConfig(symbol=symbol, **config[symbol])
         
         self.edit_window = EditWindow(self.rw_lock, strategy_config)
         self.edit_window.show()

@@ -1,7 +1,6 @@
 import MetaTrader5 as mt5
 
 from windows.models import TradingStrategyConfig
-from typing import Union
 from windows.models import Config
 from PyQt5.QtCore import QThread, QReadWriteLock
 
@@ -19,23 +18,6 @@ class BaseThread(QThread):
         }
         super().__init__()
 
-    def get_trade_volume(self,
-                         strategy_config: TradingStrategyConfig,
-                         entry: Union[int, float],
-                         stop_loss: Union[int, float],
-                         risk_amount: Union[int, float]) -> float:
-        price_difference = abs(entry - stop_loss)
-        trade_volume = risk_amount / price_difference
-
-        if strategy_config.unit_factor != 0:
-            trade_volume = int(trade_volume)
-            trade_volume = trade_volume / strategy_config.unit_factor
-
-        minimum_volume = 0.01
-        trade_volume = round(trade_volume, 2) if trade_volume >= minimum_volume else minimum_volume
-
-        return price_difference, trade_volume
-    
     def create_buy_sell_stop_order(self, symbol: str, order_type: int, volume: float, price: float, take_profit: float):
         request = {
             "action": mt5.TRADE_ACTION_PENDING,
@@ -50,7 +32,7 @@ class BaseThread(QThread):
         }
         return mt5.order_send(request)
     
-    def get_take_profit_price(self, signal: int, strategy_config: TradingStrategyConfig, entry: Union[int, float]) -> Union[int, float]:
+    def get_take_profit_price(self, position_type: int, strategy_config: TradingStrategyConfig, entry: float) -> float:
         price_difference = strategy_config.position.price_difference * strategy_config.risk_reward
 
         take_profit = {
@@ -58,4 +40,4 @@ class BaseThread(QThread):
             1: entry - price_difference
         }
         
-        return take_profit[signal]
+        return take_profit[position_type]

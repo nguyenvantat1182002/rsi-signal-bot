@@ -3,7 +3,6 @@ import pandas as pd
 import detector
 import pandas_ta as ta
 
-from typing import Union
 from datetime import datetime, timedelta
 from windows.models import TradingStrategyConfig, Position
 from PyQt5.QtCore import QReadWriteLock, QThread
@@ -58,8 +57,25 @@ class OrderExecutorThread(BaseThread):
         df.dropna(inplace=True)
         
         return df
+    
+    def get_trade_volume(self,
+                         strategy_config: TradingStrategyConfig,
+                         entry: float,
+                         stop_loss: float,
+                         risk_amount: float) -> float:
+        price_difference = abs(entry - stop_loss)
+        trade_volume = risk_amount / price_difference
 
-    def determine_order_parameters(self, df: pd.DataFrame, strategy_config: TradingStrategyConfig, signal: int):
+        if strategy_config.unit_factor != 0:
+            trade_volume = int(trade_volume)
+            trade_volume = trade_volume / strategy_config.unit_factor
+
+        minimum_volume = 0.01
+        trade_volume = round(trade_volume, 2) if trade_volume >= minimum_volume else minimum_volume
+
+        return price_difference, trade_volume
+
+    def determine_order_parameters(self, df: pd.DataFrame, strategy_config: TradingStrategyConfig, position_type: int):
         atr = df['atr'].iloc[-2]
         info_tick = mt5.symbol_info_tick(strategy_config.symbol)
 
@@ -67,14 +83,14 @@ class OrderExecutorThread(BaseThread):
         entry = info_tick.ask
         stop_loss = entry - atr * strategy_config.atr_multiplier
 
-        if signal == 1:
+        if position_type == 1:
             order_type = mt5.ORDER_TYPE_SELL
             entry = info_tick.bid
             stop_loss = entry + atr * strategy_config.atr_multiplier
             
         return order_type, entry, stop_loss
 
-    def get_risk_amount(self, strategy_config: TradingStrategyConfig) -> Union[int, float]:
+    def get_risk_amount(self, strategy_config: TradingStrategyConfig) -> float:
         risk_amount = strategy_config.risk_amount
 
         if strategy_config.risk_type == '%':
