@@ -51,6 +51,7 @@ class EditWindow(QMainWindow):
             self.spinBox_4.setValue(self.strategy_config.atr_multiplier)
             self.doubleSpinBox_2.setValue(self.strategy_config.risk_reward)
             self.checkBox_6.setChecked(self.strategy_config.use_default_volume)
+            self.checkBox.setChecked(self.strategy_config.use_filter)
 
     def checkBox_stateChanged(self):
         self.comboBox_2.setEnabled(self.checkBox.isChecked())

@@ -1,7 +1,7 @@
 {
     "BTCUSDm": {
         "timeframe": "5m",
-        "timeframe_filter": "15m",
+        "timeframe_filter": "1h",
         "risk_amount": 0.01,
         "risk_type": "Cash",
         "unit_factor": 0,
@@ -10,13 +10,13 @@
         "is_running": false,
         "next_search_signal_time": "2024-09-06T14:33:45.896886",
         "position": null,
-        "divergence_time": "2024-09-06T06:35:00",
+        "divergence_time": null,
         "hedging_mode": false,
         "default_volume": 0.01,
         "atr_multiplier": 3,
         "risk_reward": 2.0,
         "use_default_volume": true,
-        "use_filter": false
+        "use_filter": true
     },
     "XAUUSDm": {
         "timeframe": "5m",
