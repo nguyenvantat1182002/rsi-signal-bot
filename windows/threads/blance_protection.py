@@ -1,5 +1,6 @@
 import MetaTrader5 as mt5
 
+from decimal import Decimal, ROUND_DOWN
 from PyQt5.QtCore import QThread
 from windows.models import TradingStrategyConfig
 from PyQt5.QtCore import QReadWriteLock
@@ -23,11 +24,13 @@ class BlanceProtectionThread(BaseThread):
                         
                         if not mt5.orders_get(symbol=key):
                             entry = strategy_config.position.stop_loss if lastest_position.type == positions[0].type else positions[0].price_open
+                            trade_volume = Decimal(lastest_position.volume * (2 if len(positions) < 3 else 1.5))
+                            trade_volume = float(trade_volume.quantize(Decimal('0.01'), rounding=ROUND_DOWN))
 
                             result = self.create_buy_sell_stop_order(
                                 symbol=strategy_config.symbol,
                                 order_type=self.order_type_mapping[lastest_position.type],
-                                volume=round(lastest_position.volume * (2 if len(positions) < 3 else 1.5), 2),
+                                volume=trade_volume,
                                 price=entry,
                                 take_profit=self.get_take_profit_price(self.toggle_mapping[lastest_position.type], strategy_config, entry)
                             )
