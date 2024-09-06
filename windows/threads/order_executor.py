@@ -59,8 +59,10 @@ class OrderExecutorThread(BaseThread):
         
         return df
 
-    def determine_order_parameters(self, df: pd.DataFrame, signal: int, info_tick: mt5.Tick, strategy_config: TradingStrategyConfig):
+    def determine_order_parameters(self, df: pd.DataFrame, strategy_config: TradingStrategyConfig, signal: int):
         atr = df['atr'].iloc[-2]
+        info_tick = mt5.symbol_info_tick(strategy_config.symbol)
+
         order_type = mt5.ORDER_TYPE_BUY
         entry = info_tick.ask
         stop_loss = entry - atr * strategy_config.atr_multiplier
@@ -104,17 +106,21 @@ class OrderExecutorThread(BaseThread):
                             for item in result:
                                 print(item)
                             print(strategy_config.symbol)
+
+                            buy_only = strategy_config.buy_only
+                            sell_only = strategy_config.sell_only
                             
-                            condition = self.check_buy_sell_condition(strategy_config.symbol, self.timeframe_mapping[strategy_config.timeframe_filter])
-                            buy_only = strategy_config.buy_only and condition == 0
-                            sell_only = strategy_config.sell_only and condition == 1
+                            if strategy_config.use_filter:
+                                condition = self.check_buy_sell_condition(strategy_config.symbol, self.timeframe_mapping[strategy_config.timeframe_filter])
+                                buy_only = strategy_config.buy_only and condition == 0
+                                sell_only = strategy_config.sell_only and condition == 1
 
                             trading_allowed = False if not self.multiple_pairs and mt5.positions_total() > 0 else True
 
-                            if ((signal == 0 and buy_only) or (signal == 1 and sell_only)) and not mt5.positions_get(symbol=strategy_config.symbol) and trading_allowed:
-                                info_tick = mt5.symbol_info_tick(strategy_config.symbol)
-
-                                order_type, entry, stop_loss = self.determine_order_parameters(df, signal, info_tick, strategy_config)
+                            if trading_allowed \
+                                    and ((signal == 0 and buy_only) or (signal == 1 and sell_only)) \
+                                    and not mt5.positions_get(symbol=strategy_config.symbol):
+                                order_type, entry, stop_loss = self.determine_order_parameters(df, strategy_config, signal)
                                 risk_amount = self.get_risk_amount(strategy_config)
                                 price_difference, trade_volume = self.get_trade_volume(strategy_config, entry, stop_loss, risk_amount)
 
@@ -125,29 +131,21 @@ class OrderExecutorThread(BaseThread):
 
                                 request = {
                                     'symbol': strategy_config.symbol,
-                                    'deviation': 10,
+                                    'deviation': 30,
                                     'action': mt5.TRADE_ACTION_DEAL,
                                     'type': order_type,
                                     'volume': trade_volume,
                                     'price': entry,
+                                    'tp': strategy_config.position.take_profit
                                 }
 
-                                if strategy_config.hedging_mode:
-                                    if strategy_config.use_default_volume:
-                                        request.update({'volume': strategy_config.default_volume})
-                                        
-                                    request.update({'tp': strategy_config.position.take_profit})
-                                else:
-                                    if strategy_config.use_risk_reward:
-                                        request.update({'tp': strategy_config.position.take_profit})
-
-                                    request.update({'sl': stop_loss})
+                                if strategy_config.use_default_volume:
+                                    request.update({'volume': strategy_config.default_volume})
                                     
-                                print(request)
-
                                 result = mt5.order_send(request)
+                                print(result)
+
                                 if not result.retcode == 10009:
-                                    print(result)
                                     print(__class__.__name__ + ':', 'Stop')
                                     return
                                     

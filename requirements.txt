@@ -5,3 +5,4 @@ pandas_ta
 # mplfinance
 pyqt5
 pyqt5-tools
+pydantic

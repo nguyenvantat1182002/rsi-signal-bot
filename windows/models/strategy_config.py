@@ -27,8 +27,8 @@ class TradingStrategyConfig(BaseModel):
     atr_multiplier: int = 5
     risk_reward: float = 1.
     use_default_volume: bool = False
-    use_risk_reward: bool = False
-
+    use_filter: bool = False
+    
     @field_validator('symbol')
     def symbol_is_not_empty(cls, value: str):
         if not value:

@@ -44,17 +44,14 @@ class BaseThread(QThread):
             "type": order_type,
             "price": price,
             "tp": take_profit,
-            'deviation': 10,
+            'deviation': 30,
             "type_time": mt5.ORDER_TIME_GTC,
             "type_filling": mt5.ORDER_FILLING_IOC,
         }
         return mt5.order_send(request)
     
     def get_take_profit_price(self, signal: int, strategy_config: TradingStrategyConfig, entry: Union[int, float]) -> Union[int, float]:
-        price_difference = strategy_config.position.price_difference
-
-        if strategy_config.hedging_mode or strategy_config.use_risk_reward:
-            price_difference = strategy_config.position.price_difference * strategy_config.risk_reward
+        price_difference = strategy_config.position.price_difference * strategy_config.risk_reward
 
         take_profit = {
             0: entry + price_difference,

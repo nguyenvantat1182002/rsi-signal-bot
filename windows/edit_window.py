@@ -26,9 +26,8 @@ class EditWindow(QMainWindow):
         self.strategy_config = strategy_config
         
         self.lineEdit.textChanged.connect(self.lineEdit_textChanged)
-        self.checkBox_5.stateChanged.connect(self.checkBox_5_stateChanged)
+        self.checkBox.stateChanged.connect(self.checkBox_stateChanged)
         self.checkBox_6.stateChanged.connect(self.checkBox_6_stateChanged)
-        self.checkBox_7.stateChanged.connect(self.checkBox_7_stateChanged)
         self.pushButton.clicked.connect(self.pushButton_clicked)
 
         self.symbols_model  = QStandardItemModel()
@@ -48,24 +47,14 @@ class EditWindow(QMainWindow):
             self.checkBox_2.setChecked(self.strategy_config.buy_only)
             self.checkBox_3.setChecked(self.strategy_config.sell_only)
             self.spinBox_3.setValue(strategy_config.unit_factor)
-            self.checkBox_5.setChecked(self.strategy_config.hedging_mode)
             self.doubleSpinBox.setValue(self.strategy_config.default_volume)
             self.spinBox_4.setValue(self.strategy_config.atr_multiplier)
             self.doubleSpinBox_2.setValue(self.strategy_config.risk_reward)
             self.checkBox_6.setChecked(self.strategy_config.use_default_volume)
-            self.checkBox_7.setChecked(self.strategy_config.use_risk_reward)
 
-    def checkBox_5_stateChanged(self):
-        self.checkBox_7.setChecked(self.checkBox_5.isChecked())
+    def checkBox_stateChanged(self):
+        self.comboBox_2.setEnabled(self.checkBox.isChecked())
         
-    def checkBox_7_stateChanged(self):
-        value: bool = self.checkBox_7.isChecked()
-
-        self.doubleSpinBox_2.setEnabled(value)
-
-        if not value and self.checkBox_5.isChecked():
-            self.checkBox_5.setChecked(False)
-
     def checkBox_6_stateChanged(self):
         value: bool = self.checkBox_6.isChecked()
 
@@ -97,12 +86,11 @@ class EditWindow(QMainWindow):
             'unit_factor': self.spinBox_3.value(),
             'buy_only': self.checkBox_2.isChecked(),
             'sell_only': self.checkBox_3.isChecked(),
-            'hedging_mode': self.checkBox_5.isChecked(),
             'default_volume': self.doubleSpinBox.value(),
             'atr_multiplier': self.spinBox_4.value(),
             'risk_reward': self.doubleSpinBox_2.value(),
             'use_default_volume': self.checkBox_6.isChecked(),
-            'use_risk_reward': self.checkBox_7.isChecked(),
+            'use_filter': self.checkBox.isChecked()
         }
 
         config = Config(self.rw_lock)

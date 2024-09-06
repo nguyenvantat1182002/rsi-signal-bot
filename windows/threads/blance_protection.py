@@ -15,7 +15,8 @@ class BlanceProtectionThread(BaseThread):
             config = self.config.get()
             for key, value in config.items():
                 strategy_config = TradingStrategyConfig(symbol=key, **value)
-                if strategy_config.is_running and strategy_config.hedging_mode and strategy_config.position:
+
+                if strategy_config.is_running and strategy_config.position:
                     positions = mt5.positions_get(symbol=key)
                     if positions:
                         lastest_position = positions[-1]
@@ -26,14 +27,13 @@ class BlanceProtectionThread(BaseThread):
                             result = self.create_buy_sell_stop_order(
                                 symbol=strategy_config.symbol,
                                 order_type=self.order_type_mapping[lastest_position.type],
-                                volume=lastest_position.volume * (2 if len(positions) < 3 else 1.5),
+                                volume=round(lastest_position.volume * (2 if len(positions) < 3 else 1.5), 2),
                                 price=entry,
                                 take_profit=self.get_take_profit_price(self.toggle_mapping[lastest_position.type], strategy_config, entry)
                             )
                             if not result.retcode == 10009:
                                 print(result)
-                                print(__class__.__name__ + ':', 'Stop')
-                                return
+                                print(__class__.__name__ + ':', 'Error')
                         else:
                             for item in positions[:-1]:
                                 request = {
