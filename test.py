@@ -1,5 +1,24 @@
-from decimal import Decimal, ROUND_DOWN
+import pandas as pd
+import pandas_ta as ta
+import MetaTrader5 as mt5
+import detector
 
-number = Decimal(f'{0.13*1.5}')
-result = float(number.quantize(Decimal('0.01'), rounding=ROUND_DOWN))
-print(result, type(result))
+
+def create_data_frame(symbol: str, timeframe: int) -> pd.DataFrame:
+    rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, 500)
+    
+    df = pd.DataFrame(rates)
+    df['time'] = pd.to_datetime(df['time'], unit='s')
+    df['rsi'] = ta.rsi(df['close'], 14)
+    df['atr'] = ta.atr(df['high'], df['low'], df['close'], 14)
+
+    df.dropna(inplace=True)
+
+    return df
+
+
+mt5.initialize()
+
+df = create_data_frame('BTCUSDm', mt5.TIMEFRAME_M5)
+result = detector.detect_divergence(df, 5)
+print(result)

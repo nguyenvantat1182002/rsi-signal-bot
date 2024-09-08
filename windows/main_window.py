@@ -15,7 +15,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         uic.loadUi(os.path.join(os.getcwd(), 'ui', 'MainWindow.ui'), self)
 
-        self.setWindowTitle('TRADER 3')
+        self.setWindowTitle('TRADER 4')
         
         self.pushButton.clicked.connect(self.pushButton_clicked)
         self.pushButton_2.clicked.connect(self.pushButton_2_clicked)

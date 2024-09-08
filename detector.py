@@ -63,9 +63,11 @@ def detect_divergence(df: pd.DataFrame, window_size: int = 3) -> list:
     df['rsi_pivot_high'] = df['rsi'] == df['rsi'].rolling(2 * window_size + 1, center=True).max()
     df['rsi_pivot_low'] = df['rsi'] == df['rsi'].rolling(2 * window_size + 1, center=True).min()
 
+    prev_candle = df.iloc[-1]
+
     current_pivot_low = df[df['rsi_pivot_low']].iloc[-1]
     bullish_divergence_point = is_bullish_divergence(df, current_pivot_low)
-    if bullish_divergence_point is not None:
+    if bullish_divergence_point is not None and prev_candle['close'] > current_pivot_low['high']:
         tmp = get_lowest_pivot_bar(df, current_pivot_low)
         nearest_pivot_low_candle = get_lowest_pivot_bar(df, bullish_divergence_point)
 
@@ -77,7 +79,7 @@ def detect_divergence(df: pd.DataFrame, window_size: int = 3) -> list:
     
     current_pivot_high = df[df['rsi_pivot_high']].iloc[-1]
     bearish_divergence_point = is_bearish_divergence(df, current_pivot_high)
-    if bearish_divergence_point is not None:
+    if bearish_divergence_point is not None and prev_candle['close'] < current_pivot_high['low']:
         tmp = get_highest_pivot_bar(df, current_pivot_high)
         nearest_pivot_high_candle = get_highest_pivot_bar(df, bearish_divergence_point)
 
