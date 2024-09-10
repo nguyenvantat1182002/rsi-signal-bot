@@ -84,7 +84,7 @@ def detect_divergence(df: pd.DataFrame, window_size: int = 3) -> Optional[Diverg
     distance_to_pivot_low = len(df) - df.index.get_loc(current_pivot_low.name) - 1
     bullish_divergence_point = is_bullish_divergence(df, current_pivot_low)
     if bullish_divergence_point is not None \
-            and distance_to_pivot_low < max_pivot_distance \
+            and distance_to_pivot_low <= max_pivot_distance \
             and prev_candle['close'] > current_pivot_low['high']:
         tmp = get_lowest_pivot_bar(df, current_pivot_low)
         nearest_pivot_low_candle = get_lowest_pivot_bar(df, bullish_divergence_point)
@@ -105,7 +105,7 @@ def detect_divergence(df: pd.DataFrame, window_size: int = 3) -> Optional[Diverg
     distance_to_pivot_high = len(df) - df.index.get_loc(current_pivot_high.name) - 1
     bearish_divergence_point = is_bearish_divergence(df, current_pivot_high)
     if bearish_divergence_point is not None \
-            and distance_to_pivot_high < max_pivot_distance \
+            and distance_to_pivot_high <= max_pivot_distance \
             and prev_candle['close'] < current_pivot_high['low']:
         tmp = get_highest_pivot_bar(df, current_pivot_high)
         nearest_pivot_high_candle = get_highest_pivot_bar(df, bearish_divergence_point)

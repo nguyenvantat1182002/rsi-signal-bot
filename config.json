@@ -11,12 +11,16 @@
         "buy_only": true,
         "sell_only": true,
         "is_running": true,
-        "next_search_signal_time": "2024-09-10T14:28:10.033358",
-        "position": null,
+        "next_search_signal_time": "2024-09-10T15:50:55.485367",
+        "position": {
+            "price_difference": 141.87390051413968,
+            "stop_loss": 57362.87390051414,
+            "take_profit": 56937.25219897172
+        },
         "hedging_mode": false,
         "default_volume": 0.01,
         "atr_multiplier": 3,
-        "risk_reward": 2.0,
+        "risk_reward": 3.0,
         "use_default_volume": true,
         "use_filter": true
     },
@@ -32,16 +36,16 @@
         "buy_only": true,
         "sell_only": true,
         "is_running": true,
-        "next_search_signal_time": "2024-09-10T14:28:11.058913",
+        "next_search_signal_time": "2024-09-10T15:49:55.962667",
         "position": {
-            "price_difference": 1.546937913556576,
-            "stop_loss": 2505.9209379135564,
-            "take_profit": 2501.2801241728866
+            "price_difference": 2.01726118754641,
+            "stop_loss": 2500.0447388124535,
+            "take_profit": 2506.0965223750927
         },
         "hedging_mode": false,
         "default_volume": 0.01,
         "atr_multiplier": 3,
-        "risk_reward": 2.0,
+        "risk_reward": 3.0,
         "use_default_volume": true,
         "use_filter": true
     }
