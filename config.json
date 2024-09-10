@@ -36,7 +36,7 @@
         "buy_only": true,
         "sell_only": true,
         "is_running": true,
-        "next_search_signal_time": "2024-09-10T15:49:55.962667",
+        "next_search_signal_time": "2024-09-10T15:50:56.518100",
         "position": {
             "price_difference": 2.01726118754641,
             "stop_loss": 2500.0447388124535,
