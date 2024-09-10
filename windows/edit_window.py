@@ -37,24 +37,34 @@ class EditWindow(QMainWindow):
         for symbol in symbols:
             self.symbols_model.appendRow(QStandardItem(symbol))
 
+        self.timeframe_checkbox_mapping = {
+            '15m': self.checkBox_4,
+            '1h': self.checkBox_5,
+            '4h': self.checkBox_7,
+            '1d': self.checkBox_8,
+        }
+
         if self.strategy_config is not None:
             self.setWindowTitle(f'{self.strategy_config.symbol} - EDIT')
             self.lineEdit.setText(self.strategy_config.symbol)
             self.comboBox.setCurrentText(self.strategy_config.timeframe)
-            self.comboBox_2.setCurrentText(self.strategy_config.timeframe_filter)
             self.doubleSpinBox_3.setValue(self.strategy_config.risk_amount)
             self.comboBox_3.setCurrentText(self.strategy_config.risk_type)
             self.checkBox_2.setChecked(self.strategy_config.buy_only)
             self.checkBox_3.setChecked(self.strategy_config.sell_only)
-            self.spinBox_3.setValue(strategy_config.unit_factor)
+            self.spinBox_3.setValue(self.strategy_config.unit_factor)
             self.doubleSpinBox.setValue(self.strategy_config.default_volume)
             self.spinBox_4.setValue(self.strategy_config.atr_multiplier)
             self.doubleSpinBox_2.setValue(self.strategy_config.risk_reward)
             self.checkBox_6.setChecked(self.strategy_config.use_default_volume)
             self.checkBox.setChecked(self.strategy_config.use_filter)
-
+            
+            for filter in self.strategy_config.timeframe_filters:
+                self.timeframe_checkbox_mapping[filter].setChecked(True)
+    
     def checkBox_stateChanged(self):
-        self.comboBox_2.setEnabled(self.checkBox.isChecked())
+        for filter in self.timeframe_checkbox_mapping:
+            self.timeframe_checkbox_mapping[filter].setEnabled(self.checkBox.isChecked())
         
     def checkBox_6_stateChanged(self):
         value: bool = self.checkBox_6.isChecked()
@@ -81,7 +91,7 @@ class EditWindow(QMainWindow):
         params = {
             'symbol': self.lineEdit.text(),
             'timeframe': self.comboBox.currentText(),
-            'timeframe_filter': self.comboBox_2.currentText(),
+            'timeframe_filters': [],
             'risk_amount': self.doubleSpinBox_3.value(),
             'risk_type': self.comboBox_3.currentText(),
             'unit_factor': self.spinBox_3.value(),
@@ -93,6 +103,10 @@ class EditWindow(QMainWindow):
             'use_default_volume': self.checkBox_6.isChecked(),
             'use_filter': self.checkBox.isChecked()
         }
+
+        for filter in self.timeframe_checkbox_mapping:
+            if self.timeframe_checkbox_mapping[filter].isChecked():
+                params['timeframe_filters'].append(filter)
 
         config = Config(self.rw_lock)
         with config.load_and_update() as config:

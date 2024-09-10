@@ -12,7 +12,7 @@ class Position(BaseModel):
 class TradingStrategyConfig(BaseModel):
     symbol: str
     timeframe: str
-    timeframe_filter: str
+    timeframe_filters: list[str] = []
     risk_amount: float = 10
     risk_type: str = 'Cash'
     unit_factor: int = 0
@@ -21,7 +21,6 @@ class TradingStrategyConfig(BaseModel):
     is_running: bool = False
     next_search_signal_time: datetime = Field(default_factory=datetime.now)
     position: Optional[Position] = None
-    divergence_time: Optional[datetime] = None
     hedging_mode: bool = False
     default_volume: float = 0.01
     atr_multiplier: int = 5

@@ -19,6 +19,9 @@ def create_data_frame(symbol: str, timeframe: int) -> pd.DataFrame:
 
 mt5.initialize()
 
-df = create_data_frame('BTCUSDm', mt5.TIMEFRAME_M5)
+df = create_data_frame('XAUUSDm', mt5.TIMEFRAME_M5)
 result = detector.detect_divergence(df, 5)
-print(result)
+if result is not None:
+    print(result.divergence_type)
+    print(result.rsi_point)
+    print(result.price_point)

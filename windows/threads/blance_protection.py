@@ -31,7 +31,7 @@ class BlanceProtectionThread(BaseThread):
                                 price=entry,
                                 take_profit=self.get_take_profit_price(self.toggle_mapping[lastest_position.type], strategy_config, entry)
                             )
-                            if not result.retcode == 10009:
+                            if not result.retcode == mt5.TRADE_RETCODE_DONE:
                                 print(result)
                                 print(__class__.__name__ + ':', 'Error')
                         else:
