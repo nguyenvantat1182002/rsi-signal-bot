@@ -63,8 +63,9 @@ class EditWindow(QMainWindow):
                 self.timeframe_checkbox_mapping[filter].setChecked(True)
     
     def checkBox_stateChanged(self):
+        value = self.checkBox.isChecked()
         for filter in self.timeframe_checkbox_mapping:
-            self.timeframe_checkbox_mapping[filter].setEnabled(self.checkBox.isChecked())
+            self.timeframe_checkbox_mapping[filter].setEnabled(value)
         
     def checkBox_6_stateChanged(self):
         value: bool = self.checkBox_6.isChecked()

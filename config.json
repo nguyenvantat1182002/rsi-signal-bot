@@ -11,18 +11,18 @@
         "buy_only": true,
         "sell_only": true,
         "is_running": true,
-        "next_search_signal_time": "2024-09-11T05:29:19.622843",
+        "next_search_signal_time": "2024-09-11T16:40:50.780618",
         "position": {
-            "price_difference": 233.07170787624636,
-            "stop_loss": 57887.61170787625,
-            "take_profit": 56955.32487637126
+            "price_difference": 108.66915422946477,
+            "stop_loss": 56634.40915422946,
+            "take_profit": 56199.732537311604
         },
         "hedging_mode": false,
         "default_volume": 0.01,
         "atr_multiplier": 3,
         "risk_reward": 3.0,
         "use_default_volume": true,
-        "use_filter": true
+        "use_filter": false
     },
     "XAUUSDm": {
         "timeframe": "1m",
@@ -36,17 +36,17 @@
         "buy_only": true,
         "sell_only": true,
         "is_running": true,
-        "next_search_signal_time": "2024-09-11T05:29:20.646478",
+        "next_search_signal_time": "2024-09-11T16:40:48.745748",
         "position": {
-            "price_difference": 1.7896624634481668,
-            "stop_loss": 2516.579662463448,
-            "take_profit": 2509.4210126096555
+            "price_difference": 2.7441000507433273,
+            "stop_loss": 2527.750100050743,
+            "take_profit": 2516.77369984777
         },
         "hedging_mode": false,
         "default_volume": 0.01,
         "atr_multiplier": 3,
         "risk_reward": 3.0,
         "use_default_volume": true,
-        "use_filter": true
+        "use_filter": false
     }
 }
