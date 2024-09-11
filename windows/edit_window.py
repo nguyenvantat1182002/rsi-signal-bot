@@ -56,7 +56,7 @@ class EditWindow(QMainWindow):
             self.checkBox_3.setChecked(self.strategy_config.sell_only)
             self.spinBox_3.setValue(self.strategy_config.unit_factor)
             self.doubleSpinBox.setValue(self.strategy_config.default_volume)
-            self.spinBox_4.setValue(self.strategy_config.atr_multiplier)
+            self.doubleSpinBox_4.setValue(self.strategy_config.atr_multiplier)
             self.doubleSpinBox_2.setValue(self.strategy_config.risk_reward)
             self.checkBox_6.setChecked(self.strategy_config.use_default_volume)
             self.checkBox.setChecked(self.strategy_config.use_filter)
@@ -101,7 +101,7 @@ class EditWindow(QMainWindow):
             'buy_only': self.checkBox_2.isChecked(),
             'sell_only': self.checkBox_3.isChecked(),
             'default_volume': self.doubleSpinBox.value(),
-            'atr_multiplier': self.spinBox_4.value(),
+            'atr_multiplier': self.doubleSpinBox_4.value(),
             'risk_reward': self.doubleSpinBox_2.value(),
             'use_default_volume': self.checkBox_6.isChecked(),
             'use_filter': self.checkBox.isChecked()

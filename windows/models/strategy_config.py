@@ -1,12 +1,12 @@
-from typing import Optional, Union
+from typing import Optional
 from datetime import datetime
 from pydantic import BaseModel, field_validator, Field
 
 
 class Position(BaseModel):
-    price_difference: Union[int, float] = -1
-    stop_loss: Union[int, float] = -1
-    take_profit: Union[int, float] = -1
+    price_difference: float = -1
+    stop_loss: float = -1
+    take_profit: float = -1
 
 
 class TradingStrategyConfig(BaseModel):
@@ -22,7 +22,7 @@ class TradingStrategyConfig(BaseModel):
     next_search_signal_time: datetime = Field(default_factory=datetime.now)
     position: Optional[Position] = None
     default_volume: float = 0.01
-    atr_multiplier: int = 5
+    atr_multiplier: float = 5.
     risk_reward: float = 1.
     use_default_volume: bool = False
     use_filter: bool = False
