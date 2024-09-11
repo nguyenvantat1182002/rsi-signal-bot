@@ -22,6 +22,8 @@ class EditWindow(QMainWindow):
         super().__init__()
         uic.loadUi(os.path.join(os.getcwd(), 'ui', 'EditWindow.ui'), self)
 
+        self.setWindowTitle('TRADER 4 - EDIT')
+
         self.rw_lock = rw_lock
         self.strategy_config = strategy_config
         
