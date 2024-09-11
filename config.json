@@ -10,7 +10,7 @@
         "unit_factor": 0,
         "buy_only": true,
         "sell_only": true,
-        "is_running": true,
+        "is_running": false,
         "next_search_signal_time": "2024-09-11T16:59:00.942320",
         "position": {
             "price_difference": 108.66915422946477,
@@ -35,7 +35,7 @@
         "unit_factor": 100,
         "buy_only": true,
         "sell_only": true,
-        "is_running": true,
+        "is_running": false,
         "next_search_signal_time": "2024-09-11T16:58:58.908227",
         "position": {
             "price_difference": 2.7441000507433273,

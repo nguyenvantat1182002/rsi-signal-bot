@@ -21,7 +21,6 @@ class TradingStrategyConfig(BaseModel):
     is_running: bool = False
     next_search_signal_time: datetime = Field(default_factory=datetime.now)
     position: Optional[Position] = None
-    hedging_mode: bool = False
     default_volume: float = 0.01
     atr_multiplier: int = 5
     risk_reward: float = 1.
