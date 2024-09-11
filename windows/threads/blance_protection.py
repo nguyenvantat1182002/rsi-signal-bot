@@ -23,13 +23,15 @@ class BlanceProtectionThread(BaseThread):
                         
                         if not mt5.orders_get(symbol=key):
                             entry = strategy_config.position.stop_loss if lastest_position.type == positions[0].type else positions[0].price_open
+                            trade_volume = round(lastest_position.volume * (2 if len(positions) < 3 else 1.5), 2)
+                            take_profit = self.get_take_profit_price(self.toggle_mapping[lastest_position.type], strategy_config, entry)
 
                             result = self.create_buy_sell_stop_order(
                                 symbol=strategy_config.symbol,
                                 order_type=self.order_type_mapping[lastest_position.type],
-                                volume=round(lastest_position.volume * (2 if len(positions) < 3 else 1.5), 2),
+                                volume=trade_volume,
                                 price=entry,
-                                take_profit=self.get_take_profit_price(self.toggle_mapping[lastest_position.type], strategy_config, entry)
+                                take_profit=take_profit
                             )
                             if not result.retcode == mt5.TRADE_RETCODE_DONE:
                                 print(result)

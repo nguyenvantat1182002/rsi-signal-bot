@@ -78,7 +78,7 @@ def detect_divergence(df: pd.DataFrame, window_size: int = 3) -> Optional[Diverg
     df['rsi_pivot_low'] = df['rsi'] == df['rsi'].rolling(2 * window_size + 1, center=True).min()
 
     prev_candle = df.iloc[-2]
-    max_pivot_distance = 7
+    max_pivot_distance = 9
 
     current_pivot_low = df[df['rsi_pivot_low']].iloc[-1]
     distance_to_pivot_low = len(df) - df.index.get_loc(current_pivot_low.name) - 1
