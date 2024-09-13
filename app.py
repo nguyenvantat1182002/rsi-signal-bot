@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication
 from windows import MainWindow
 
 
-VERSION = 5
+VERSION = 4
 
 
 if mt5.initialize():
