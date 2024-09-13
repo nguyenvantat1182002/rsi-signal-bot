@@ -11,11 +11,13 @@ from PyQt5.QtGui import QCloseEvent
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, version: int = 5):
         super().__init__()
         uic.loadUi(os.path.join(os.getcwd(), 'ui', 'MainWindow.ui'), self)
 
-        self.setWindowTitle('TRADER 4')
+        self.version = version
+
+        self.setWindowTitle(f'TRADER {self.version}')
         
         self.pushButton.clicked.connect(self.pushButton_clicked)
         self.pushButton_2.clicked.connect(self.pushButton_2_clicked)
@@ -105,7 +107,7 @@ class MainWindow(QMainWindow):
         symbol = self.get_selected_symbol()
         strategy_config = TradingStrategyConfig(symbol=symbol, **config[symbol])
         
-        self.edit_window = EditWindow(self.rw_lock, strategy_config)
+        self.edit_window = EditWindow(self.version, self.rw_lock, strategy_config)
         self.edit_window.show()
 
     def remove_button_clicked(self):
@@ -114,7 +116,7 @@ class MainWindow(QMainWindow):
             config.pop(symbol)
         
     def pushButton_clicked(self):
-        self.edit_window = EditWindow(self.rw_lock)
+        self.edit_window = EditWindow(self.version, self.rw_lock)
         self.edit_window.show()
 
     def on_file_changed(self, _: str):

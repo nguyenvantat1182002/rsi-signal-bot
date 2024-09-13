@@ -45,7 +45,7 @@ def is_bearish_divergence(df: pd.DataFrame, current_pivot_high: pd.Series) -> Op
     if not nearest_rsi_pivot_high.empty:
         nearest_rsi_pivot_high = nearest_rsi_pivot_high.iloc[-1]
         
-        if nearest_rsi_pivot_high['rsi'] > 60:
+        if nearest_rsi_pivot_high['rsi'] > 70:
             current_pivot_high = get_highest_pivot_bar(df, current_pivot_high)
             nearest_pivot_high_candle = get_highest_pivot_bar(df, nearest_rsi_pivot_high)
             
@@ -60,7 +60,7 @@ def is_bullish_divergence(df: pd.DataFrame, current_pivot_low: pd.Series) -> Opt
     if not nearest_rsi_pivot_low.empty:
         nearest_rsi_pivot_low = nearest_rsi_pivot_low.iloc[-1]
 
-        if nearest_rsi_pivot_low['rsi'] < 40:
+        if nearest_rsi_pivot_low['rsi'] < 30:
             current_pivot_low = get_lowest_pivot_bar(df, current_pivot_low)
             nearest_pivot_low_candle = get_lowest_pivot_bar(df, nearest_rsi_pivot_low)
 

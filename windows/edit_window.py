@@ -18,11 +18,11 @@ def get_symbols():
 
 
 class EditWindow(QMainWindow):
-    def __init__(self, rw_lock: QReadWriteLock, strategy_config: Optional[TradingStrategyConfig] = None):
+    def __init__(self, version: int, rw_lock: QReadWriteLock, strategy_config: Optional[TradingStrategyConfig] = None):
         super().__init__()
         uic.loadUi(os.path.join(os.getcwd(), 'ui', 'EditWindow.ui'), self)
 
-        self.setWindowTitle('TRADER 4 - EDIT')
+        self.setWindowTitle(f'TRADER {version} - EDIT')
 
         self.rw_lock = rw_lock
         self.strategy_config = strategy_config

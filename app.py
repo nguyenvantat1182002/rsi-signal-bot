@@ -4,10 +4,13 @@ from PyQt5.QtWidgets import QApplication
 from windows import MainWindow
 
 
+VERSION = 5
+
+
 if mt5.initialize():
     app = QApplication([])
 
-    win = MainWindow()
+    win = MainWindow(VERSION)
     win.show()
 
     app.exec_()
