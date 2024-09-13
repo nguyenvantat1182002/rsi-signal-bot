@@ -107,65 +107,65 @@ class OrderExecutorThread(BaseThread):
                 strategy_config = TradingStrategyConfig(symbol=key, **value)
                 
                 if strategy_config.is_running and datetime.now() > strategy_config.next_search_signal_time:
-                    timeframe = self.timeframe_mapping[strategy_config.timeframe]
-                    df = self.create_data_frame(strategy_config.symbol, timeframe)
+                    if not mt5.positions_get(symbol=strategy_config.symbol):
+                        timeframe = self.timeframe_mapping[strategy_config.timeframe]
+                        df = self.create_data_frame(strategy_config.symbol, timeframe)
 
-                    result = detector.detect_divergence(df, window_size=5)
-                    if result is not None:
-                        print(strategy_config.symbol)
-                        print(result.rsi_point.start, result.rsi_point.end)
-                        print(result.price_point.start, result.price_point.end)
+                        result = detector.detect_divergence(df, window_size=5)
+                        if result is not None:
+                            print(strategy_config.symbol)
+                            print(result.rsi_point.start, result.rsi_point.end)
+                            print(result.price_point.start, result.price_point.end)
 
-                        buy_only = strategy_config.buy_only
-                        sell_only = strategy_config.sell_only
-                        
-                        if strategy_config.use_filter:
-                            for timeframe_filter in strategy_config.timeframe_filters[::-1]:
-                                condition = self.check_buy_sell_condition(strategy_config.symbol, self.timeframe_mapping[timeframe_filter])
-                                print(timeframe_filter, condition)
-
-                                if condition != 2:
+                            buy_only = strategy_config.buy_only
+                            sell_only = strategy_config.sell_only
+                            
+                            if strategy_config.use_filter:
+                                for timeframe_filter in strategy_config.timeframe_filters[::-1]:
+                                    condition = self.check_buy_sell_condition(strategy_config.symbol, self.timeframe_mapping[timeframe_filter])
+                                    print(timeframe_filter, condition)
+                                    
                                     buy_only = strategy_config.buy_only and condition == 0
                                     sell_only = strategy_config.sell_only and condition == 1
-                                    break
-                            
-                                QThread.msleep(500)
 
-                        trading_allowed = False if not self.multiple_pairs and mt5.positions_total() > 0 else True
-
-                        if trading_allowed \
-                                and ((result.divergence_type == 0 and buy_only) or (result.divergence_type == 1 and sell_only)) \
-                                and not mt5.positions_get(symbol=strategy_config.symbol):
-                            order_type, entry, stop_loss = self.determine_order_parameters(df, strategy_config, result.divergence_type)
-                            risk_amount = self.get_risk_amount(strategy_config)
-                            price_difference, trade_volume = self.get_trade_volume(strategy_config, entry, stop_loss, risk_amount)
-
-                            strategy_config.position = Position()
-                            strategy_config.position.price_difference = price_difference
-                            strategy_config.position.stop_loss = stop_loss
-                            strategy_config.position.take_profit = self.get_take_profit_price(result.divergence_type, strategy_config, entry)
-
-                            request = {
-                                'symbol': strategy_config.symbol,
-                                'deviation': 30,
-                                'action': mt5.TRADE_ACTION_DEAL,
-                                'type': order_type,
-                                'volume': trade_volume,
-                                'price': entry,
-                                'tp': strategy_config.position.take_profit
-                            }
-
-                            if strategy_config.use_default_volume:
-                                request.update({'volume': strategy_config.default_volume})
+                                    if condition != 2:
+                                        break
                                 
-                            result = mt5.order_send(request)
-                            print(result)
+                                    QThread.msleep(500)
 
-                            if not result.retcode == mt5.TRADE_RETCODE_DONE:
-                                print(__class__.__name__ + ':', 'Stop')
-                                return
-                                
-                        print()
+                            trading_allowed = False if not self.multiple_pairs and mt5.positions_total() > 0 else True
+
+                            if trading_allowed and ((result.divergence_type == 0 and buy_only) or (result.divergence_type == 1 and sell_only)):
+                                order_type, entry, stop_loss = self.determine_order_parameters(df, strategy_config, result.divergence_type)
+                                risk_amount = self.get_risk_amount(strategy_config)
+                                price_difference, trade_volume = self.get_trade_volume(strategy_config, entry, stop_loss, risk_amount)
+
+                                strategy_config.position = Position()
+                                strategy_config.position.price_difference = price_difference
+                                strategy_config.position.stop_loss = stop_loss
+                                strategy_config.position.take_profit = self.get_take_profit_price(result.divergence_type, strategy_config, entry)
+
+                                request = {
+                                    'symbol': strategy_config.symbol,
+                                    'deviation': 30,
+                                    'action': mt5.TRADE_ACTION_DEAL,
+                                    'type': order_type,
+                                    'volume': trade_volume,
+                                    'price': entry,
+                                    'tp': strategy_config.position.take_profit
+                                }
+
+                                if strategy_config.use_default_volume:
+                                    request.update({'volume': strategy_config.default_volume})
+                                    
+                                result = mt5.order_send(request)
+                                print(result)
+
+                                if not result.retcode == mt5.TRADE_RETCODE_DONE:
+                                    print(__class__.__name__ + ':', 'Stop')
+                                    return
+                                    
+                            print()
 
                     if not mt5.positions_get(symbol=strategy_config.symbol) and strategy_config.position:
                         strategy_config.position = None
