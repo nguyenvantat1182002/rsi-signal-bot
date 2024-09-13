@@ -1,7 +1,7 @@
 import MetaTrader5 as mt5
 
-from PyQt5.QtCore import QThread
 from windows.models import TradingStrategyConfig
+from PyQt5.QtCore import QThread
 from PyQt5.QtCore import QReadWriteLock
 from .base import BaseThread
 
