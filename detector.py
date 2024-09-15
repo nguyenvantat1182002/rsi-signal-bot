@@ -17,7 +17,7 @@ class DivergenceSignal:
     price_point: DivergencePoint
 
 
-def get_highest_pivot_bar(df: pd.DataFrame, pivot_candle: pd.Series, window_size: int = 3) -> pd.Series:
+def get_highest_pivot_bar(df: pd.DataFrame, pivot_candle: pd.Series, window_size: int = 5) -> pd.Series:
     left_bars = df[df['time'] < pivot_candle['time']].tail(window_size)
     right_bars = df[df['time'] > pivot_candle['time']].head(window_size)
 
@@ -36,7 +36,7 @@ def get_highest_pivot_bar(df: pd.DataFrame, pivot_candle: pd.Series, window_size
     return highest_bar
 
 
-def get_lowest_pivot_bar(df: pd.DataFrame, pivot_candle: pd.Series, window_size: int = 3) -> pd.Series:
+def get_lowest_pivot_bar(df: pd.DataFrame, pivot_candle: pd.Series, window_size: int = 5) -> pd.Series:
     left_bars = df[df['time'] < pivot_candle['time']].tail(window_size)
     right_bars = df[df['time'] > pivot_candle['time']].head(window_size)
     
