@@ -10,12 +10,12 @@
         "unit_factor": 0,
         "buy_only": true,
         "sell_only": true,
-        "is_running": false,
-        "next_search_signal_time": "2024-09-12T18:54:32.979055",
+        "is_running": true,
+        "next_search_signal_time": "2024-09-15T21:57:31.808368",
         "position": {
-            "price_difference": 137.5003483985638,
-            "stop_loss": 58369.20034839856,
-            "take_profit": 57819.198954804306
+            "price_difference": 115.7346185196584,
+            "stop_loss": 60325.28461851966,
+            "take_profit": 59862.34614444103
         },
         "default_volume": 0.01,
         "atr_multiplier": 3.0,
