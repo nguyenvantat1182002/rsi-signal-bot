@@ -113,7 +113,7 @@ class OrderExecutorThread(BaseThread):
 
                         result = detector.detect_divergence(df, window_size=5)
                         if result is not None:
-                            print(strategy_config.symbol)
+                            print(strategy_config.symbol, result.divergence_type)
                             print(result.rsi_point.start, result.rsi_point.end)
                             print(result.price_point.start, result.price_point.end)
 
