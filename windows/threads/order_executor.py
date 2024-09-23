@@ -38,14 +38,16 @@ class OrderExecutorThread(BaseThread):
         is_bullish_reversal = (current_candle['close'] < prev_candle['close']) or (current_candle['close'] < prev_candle['open'])
         is_bearish_reversal = (current_candle['close'] > prev_candle['open']) or (current_candle['close'] > prev_candle['close'])
 
-        if low_level_swept and is_bullish_reversal:
-            return 0
-        elif high_level_swept and is_bearish_reversal:
-            return 1
-        
-        return 2
+        result = 2
 
-    def create_data_frame(self, symbol: str, timeframe: int, count: int = 500) -> pd.DataFrame:
+        if low_level_swept and is_bullish_reversal:
+            result = 0
+        elif high_level_swept and is_bearish_reversal:
+            result = 1
+
+        return result
+
+    def create_data_frame(self, symbol: str, timeframe: int, count: int = 500, window_size: int = 5) -> pd.DataFrame:
         rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, count)
         
         df = pd.DataFrame(rates)
@@ -55,6 +57,11 @@ class OrderExecutorThread(BaseThread):
         df['atr'] = ta.atr(df['high'], df['low'], df['close'], 14)
 
         df.dropna(inplace=True)
+
+        df['rsi_pivot_high'] = df['rsi'] == df['rsi'].rolling(2 * window_size + 1, center=True).max()
+        df['rsi_pivot_low'] = df['rsi'] == df['rsi'].rolling(2 * window_size + 1, center=True).min()
+        df['pivot_high'] = df['high'] == df['high'].rolling(2 * window_size + 1, center=True).max()
+        df['pivot_low'] = df['low'] == df['low'].rolling(2 * window_size + 1, center=True).min()
         
         return df
     
@@ -111,7 +118,7 @@ class OrderExecutorThread(BaseThread):
                         timeframe = self.timeframe_mapping[strategy_config.timeframe]
                         df = self.create_data_frame(strategy_config.symbol, timeframe)
 
-                        result = detector.detect_divergence(df, window_size=5)
+                        result = detector.detect_divergence(df)
                         if result is not None:
                             print(strategy_config.symbol, result.divergence_type)
                             print(result.rsi_point.start, result.rsi_point.end)
