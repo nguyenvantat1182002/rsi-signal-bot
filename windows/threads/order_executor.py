@@ -118,7 +118,7 @@ class OrderExecutorThread(BaseThread):
                         timeframe = self.timeframe_mapping[strategy_config.timeframe]
                         df = self.create_data_frame(strategy_config.symbol, timeframe)
 
-                        result = detector.detect_divergence(df)
+                        result = detector.detect_divergence(df, max_pivot_distance=strategy_config.pivot_distance)
                         if result is not None:
                             print(strategy_config.symbol, result.divergence_type)
                             print(result.rsi_point.start, result.rsi_point.end)

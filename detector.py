@@ -86,12 +86,11 @@ def is_bullish_divergence(df: pd.DataFrame, current_pivot_low: pd.Series) -> Opt
     return None
 
 
-def detect_divergence(df: pd.DataFrame) -> Optional[DivergenceSignal]:
+def detect_divergence(df: pd.DataFrame, max_pivot_distance: int = 9) -> Optional[DivergenceSignal]:
     df = df.copy()
     df = df.tail(150)
     
     prev_candle = df.iloc[-2]
-    max_pivot_distance = 9
 
     current_rsi_pivot_low = df[df['rsi_pivot_low']].iloc[-1]
     current_pivot_low = df[df['pivot_low']].iloc[-1]

@@ -26,6 +26,7 @@ class TradingStrategyConfig(BaseModel):
     risk_reward: float = 1.
     use_default_volume: bool = False
     use_filter: bool = False
+    pivot_distance: int = 9
     
     @field_validator('symbol')
     def symbol_is_not_empty(cls, value: str):

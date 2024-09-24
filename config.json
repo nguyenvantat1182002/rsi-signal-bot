@@ -20,7 +20,8 @@
         "atr_multiplier": 3.0,
         "risk_reward": 3.0,
         "use_default_volume": true,
-        "use_filter": true
+        "use_filter": true,
+        "pivot_distance": 10
     },
     "XAUUSD": {
         "timeframe": "1m",

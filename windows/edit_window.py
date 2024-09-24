@@ -63,6 +63,8 @@ class EditWindow(QMainWindow):
             
             for filter in self.strategy_config.timeframe_filters:
                 self.timeframe_checkbox_mapping[filter].setChecked(True)
+
+            self.spinBox_4.setValue(self.strategy_config.pivot_distance)
     
     def checkBox_stateChanged(self):
         value = self.checkBox.isChecked()
@@ -104,7 +106,8 @@ class EditWindow(QMainWindow):
             'atr_multiplier': self.doubleSpinBox_4.value(),
             'risk_reward': self.doubleSpinBox_2.value(),
             'use_default_volume': self.checkBox_6.isChecked(),
-            'use_filter': self.checkBox.isChecked()
+            'use_filter': self.checkBox.isChecked(),
+            'pivot_distance': self.spinBox_4.value()
         }
 
         for filter in self.timeframe_checkbox_mapping:
