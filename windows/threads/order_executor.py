@@ -174,7 +174,7 @@ class OrderExecutorThread(BaseThread):
                                     
                             print()
 
-                    if not mt5.positions_get(symbol=strategy_config.symbol) and strategy_config.position:
+                    if not mt5.positions_get(symbol=strategy_config.symbol) and not mt5.orders_get(symbol=strategy_config.symbol) and strategy_config.position:
                         strategy_config.position = None
 
                     strategy_config.next_search_signal_time = datetime.now() + timedelta(minutes=timeframe)

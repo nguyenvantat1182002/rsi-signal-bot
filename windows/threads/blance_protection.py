@@ -60,4 +60,4 @@ class BlanceProtectionThread(BaseThread):
 
                 QThread.msleep(1000)
 
-            QThread.msleep(5000)
+            QThread.msleep(3000)
