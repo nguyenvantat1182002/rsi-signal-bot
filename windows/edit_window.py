@@ -107,7 +107,7 @@ class EditWindow(QMainWindow):
             'risk_reward': self.doubleSpinBox_2.value(),
             'use_default_volume': self.checkBox_6.isChecked(),
             'use_filter': self.checkBox.isChecked(),
-            'pivot_distance': self.spinBox_4.value()
+            'pivot_distance': self.spinBox_4.value(),
         }
 
         for filter in self.timeframe_checkbox_mapping:

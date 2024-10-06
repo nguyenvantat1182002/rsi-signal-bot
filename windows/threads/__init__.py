@@ -1,2 +1,2 @@
 from .order_executor import OrderExecutorThread
-from .blance_protection import BlanceProtectionThread
+from .recovery_zone import RecoveryZoneThread

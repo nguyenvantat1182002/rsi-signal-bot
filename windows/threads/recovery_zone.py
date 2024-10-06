@@ -1,12 +1,11 @@
 import MetaTrader5 as mt5
 
 from windows.models import TradingStrategyConfig
-from PyQt5.QtCore import QThread
-from PyQt5.QtCore import QReadWriteLock
+from PyQt5.QtCore import QThread, QReadWriteLock
 from .base import BaseThread
 
 
-class BlanceProtectionThread(BaseThread):
+class RecoveryZoneThread(BaseThread):
     def __init__(self, rw_lock: QReadWriteLock):
         super().__init__(rw_lock)
     

@@ -114,8 +114,9 @@ class OrderExecutorThread(BaseThread):
                 strategy_config = TradingStrategyConfig(symbol=key, **value)
                 
                 if strategy_config.is_running and datetime.now() > strategy_config.next_search_signal_time:
+                    timeframe = self.timeframe_mapping[strategy_config.timeframe]
+
                     if not mt5.positions_get(symbol=strategy_config.symbol):
-                        timeframe = self.timeframe_mapping[strategy_config.timeframe]
                         df = self.create_data_frame(strategy_config.symbol, timeframe)
 
                         result = detector.detect_divergence(df, max_pivot_distance=strategy_config.pivot_distance)
@@ -138,7 +139,7 @@ class OrderExecutorThread(BaseThread):
                                     if condition != 2:
                                         break
                                 
-                                    QThread.msleep(500)
+                                    QThread.msleep(300)
 
                             trading_allowed = False if not self.multiple_pairs and mt5.positions_total() > 0 else True
 
@@ -174,7 +175,9 @@ class OrderExecutorThread(BaseThread):
                                     
                             print()
 
-                    if not mt5.positions_get(symbol=strategy_config.symbol) and not mt5.orders_get(symbol=strategy_config.symbol) and strategy_config.position:
+                    if not mt5.positions_get(symbol=strategy_config.symbol) \
+                            and not mt5.orders_get(symbol=strategy_config.symbol) \
+                            and strategy_config.position:
                         strategy_config.position = None
 
                     strategy_config.next_search_signal_time = datetime.now() + timedelta(minutes=timeframe)

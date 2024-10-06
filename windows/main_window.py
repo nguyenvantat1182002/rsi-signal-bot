@@ -2,7 +2,7 @@ import os
 
 from .edit_window import EditWindow
 from typing import List
-from windows.threads import OrderExecutorThread, BlanceProtectionThread
+from windows.threads import OrderExecutorThread, RecoveryZoneThread
 from windows.models import TradingStrategyConfig, Config
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QPushButton
@@ -40,10 +40,10 @@ class MainWindow(QMainWindow):
         self.load_table()
 
         self.order_executor = OrderExecutorThread(self.rw_lock)
-        self.blance_protection = BlanceProtectionThread(self.rw_lock)
+        self.recovery_thread = RecoveryZoneThread(self.rw_lock)
 
         self.order_executor.start()
-        self.blance_protection.start()
+        self.recovery_thread.start()
 
     def get_active_symbols(self, config: dict) -> List[str]:
         return [symbol for symbol in config if config[symbol]['is_running']]
