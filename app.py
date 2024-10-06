@@ -6,8 +6,9 @@ from windows import MainWindow
 
 VERSION = 4
 
+path = input()
 
-if mt5.initialize():
+if mt5.initialize(path=path):
     app = QApplication([])
 
     win = MainWindow(VERSION)
