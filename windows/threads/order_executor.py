@@ -49,7 +49,7 @@ class OrderExecutorThread(BaseThread):
 
     def create_data_frame(self, symbol: str, timeframe: int, count: int = 500, window_size: int = 5) -> pd.DataFrame:
         rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, count)
-        
+
         df = pd.DataFrame(rates)
         df['time'] = pd.to_datetime(df['time'], unit='s')
 
@@ -118,7 +118,7 @@ class OrderExecutorThread(BaseThread):
 
                     if not mt5.positions_get(symbol=strategy_config.symbol):
                         df = self.create_data_frame(strategy_config.symbol, timeframe)
-
+                        
                         result = detector.detect_divergence(df, max_pivot_distance=strategy_config.pivot_distance)
                         if result is not None:
                             print(strategy_config.symbol, result.divergence_type)
@@ -130,7 +130,9 @@ class OrderExecutorThread(BaseThread):
                             
                             if strategy_config.use_filter:
                                 for timeframe_filter in strategy_config.timeframe_filters[::-1]:
-                                    condition = self.check_buy_sell_condition(strategy_config.symbol, self.timeframe_mapping[timeframe_filter])
+                                    condition = self.check_buy_sell_condition(
+                                        symbol=strategy_config.symbol,
+                                        timeframe=self.timeframe_mapping[timeframe_filter])
                                     print(timeframe_filter, condition)
                                     
                                     buy_only = strategy_config.buy_only and condition == 0

@@ -1,4 +1,5 @@
 import os
+import MetaTrader5 as mt5
 
 from .edit_window import EditWindow
 from typing import List
@@ -11,18 +12,19 @@ from PyQt5.QtGui import QCloseEvent
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, version: int = 5):
+    def __init__(self, login: str, version: int = 5):
         super().__init__()
         uic.loadUi(os.path.join(os.getcwd(), 'ui', 'MainWindow.ui'), self)
 
+        self.login = login
         self.version = version
 
-        self.setWindowTitle(f'TRADER {self.version}')
+        self.setWindowTitle(f'TRADER {self.version}: {self.login}')
         
         self.pushButton.clicked.connect(self.pushButton_clicked)
         self.pushButton_2.clicked.connect(self.pushButton_2_clicked)
         self.checkBox.stateChanged.connect(self.checkBox_stateChanged)
-
+        
         self.rw_lock = QReadWriteLock()
         self.config = Config(self.rw_lock)
         self.edit_window = None
@@ -57,7 +59,8 @@ class MainWindow(QMainWindow):
 
         button_actions = [[2, 'Bắt đầu', self.start_button_clicked],
                           [3, 'Chỉnh sửa', self.edit_button_clicked],
-                          [4, 'Xóa', self.remove_button_clicked]]
+                          [4, 'Xóa', self.remove_button_clicked],
+                          [5, 'Đóng tất cả lệnh', self.close_all_order]]
         
         while self.tableWidget.rowCount() > 0:
             self.tableWidget.removeRow(0)
@@ -107,7 +110,7 @@ class MainWindow(QMainWindow):
         symbol = self.get_selected_symbol()
         strategy_config = TradingStrategyConfig(symbol=symbol, **config[symbol])
         
-        self.edit_window = EditWindow(self.version, self.rw_lock, strategy_config)
+        self.edit_window = EditWindow(self.login, self.version, self.rw_lock, strategy_config)
         self.edit_window.show()
 
     def remove_button_clicked(self):
@@ -116,8 +119,40 @@ class MainWindow(QMainWindow):
             config.pop(symbol)
         
     def pushButton_clicked(self):
-        self.edit_window = EditWindow(self.version, self.rw_lock)
+        self.edit_window = EditWindow(self.login, self.version, self.rw_lock)
         self.edit_window.show()
+
+    def close_all_order(self):
+        symbol = self.get_selected_symbol()
+        positions = mt5.positions_get(symbol=symbol)
+
+        if not positions:
+            return
+        
+        position_type = {
+            mt5.ORDER_TYPE_BUY: mt5.ORDER_TYPE_SELL,
+            mt5.ORDER_TYPE_SELL: mt5.ORDER_TYPE_BUY
+        }
+
+        tick_info = mt5.symbol_info_tick(symbol)
+        price = {
+            mt5.ORDER_TYPE_BUY: tick_info.bid,
+            mt5.ORDER_TYPE_SELL: tick_info.ask
+        }
+
+        for position in positions:
+            request = {
+                'action': mt5.TRADE_ACTION_DEAL,
+                'position': position.ticket,
+                'symbol': position.symbol,
+                "volume": position.volume,
+                'type': position_type[position.type],
+                'price': price[position.type],
+                'deviation': 30,
+                "type_time": mt5.ORDER_TIME_GTC
+            }
+
+            mt5.order_send(request)
 
     def on_file_changed(self, _: str):
         self.load_table()
