@@ -18,11 +18,11 @@ def get_symbols():
 
 
 class EditWindow(QMainWindow):
-    def __init__(self, login: str, version: int, rw_lock: QReadWriteLock, strategy_config: Optional[TradingStrategyConfig] = None):
+    def __init__(self, version: int, rw_lock: QReadWriteLock, strategy_config: Optional[TradingStrategyConfig] = None):
         super().__init__()
         uic.loadUi(os.path.join(os.getcwd(), 'ui', 'EditWindow.ui'), self)
 
-        self.setWindowTitle(f'TRADER {version} - EDIT ({login})')
+        self.setWindowTitle(f'TRADER {version} - EDIT')
 
         self.rw_lock = rw_lock
         self.strategy_config = strategy_config
@@ -47,7 +47,7 @@ class EditWindow(QMainWindow):
         }
 
         if self.strategy_config is not None:
-            self.setWindowTitle(f'{self.strategy_config.symbol} - EDIT ({login})')
+            self.setWindowTitle(f'{self.strategy_config.symbol} - EDIT')
             self.lineEdit.setText(self.strategy_config.symbol)
             self.comboBox.setCurrentText(self.strategy_config.timeframe)
             self.doubleSpinBox_3.setValue(self.strategy_config.risk_amount)
@@ -65,6 +65,7 @@ class EditWindow(QMainWindow):
                 self.timeframe_checkbox_mapping[filter].setChecked(True)
 
             self.spinBox_4.setValue(self.strategy_config.pivot_distance)
+            self.spinBox_5.setValue(self.strategy_config.pivot_lookback)
 
     def checkBox_stateChanged(self):
         value = self.checkBox.isChecked()
@@ -108,6 +109,7 @@ class EditWindow(QMainWindow):
             'use_default_volume': self.checkBox_6.isChecked(),
             'use_filter': self.checkBox.isChecked(),
             'pivot_distance': self.spinBox_4.value(),
+            'pivot_lookback': self.spinBox_5.value()
         }
 
         for filter in self.timeframe_checkbox_mapping:

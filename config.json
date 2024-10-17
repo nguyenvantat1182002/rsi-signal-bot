@@ -1,30 +1,26 @@
 {
     "BTCUSD": {
         "timeframe": "1m",
-        "timeframe_filters": [
-            "1h"
-        ],
+        "timeframe_filters": [],
         "risk_amount": 0.01,
         "risk_type": "Cash",
         "unit_factor": 0,
         "buy_only": true,
         "sell_only": true,
         "is_running": false,
-        "next_search_signal_time": "2024-10-08T19:24:26.021141",
+        "next_search_signal_time": "2024-10-17T18:15:28.793880",
         "position": {
-            "price_difference": 238.5658886284,
-            "stop_loss": 62103.7041113716,
-            "take_profit": 63057.9676658852
+            "price_difference": 121.68780242904904,
+            "stop_loss": 67136.01219757095,
+            "take_profit": 67622.76340728714
         },
         "default_volume": 0.01,
         "atr_multiplier": 3.6,
         "risk_reward": 3.0,
         "use_default_volume": true,
         "use_filter": false,
-        "pivot_distance": 9,
-        "recovery_zone_mode": false,
-        "use_value_area": false,
-        "value_area": []
+        "pivot_distance": 20,
+        "pivot_lookback": 5
     },
     "XAUUSD": {
         "timeframe": "1m",
@@ -35,16 +31,14 @@
         "buy_only": true,
         "sell_only": true,
         "is_running": false,
-        "next_search_signal_time": "2024-10-08T23:33:46.048331",
+        "next_search_signal_time": "2024-10-17T18:15:29.803782",
         "position": null,
         "default_volume": 0.01,
         "atr_multiplier": 3.6,
         "risk_reward": 3.0,
         "use_default_volume": true,
         "use_filter": false,
-        "pivot_distance": 9,
-        "recovery_zone_mode": true,
-        "use_value_area": false,
-        "value_area": []
+        "pivot_distance": 20,
+        "pivot_lookback": 5
     }
 }

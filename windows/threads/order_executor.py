@@ -81,7 +81,7 @@ class OrderExecutorThread(BaseThread):
         trade_volume = round(trade_volume, 2) if trade_volume >= minimum_volume else minimum_volume
 
         return price_difference, trade_volume
-
+    
     def determine_order_parameters(self, df: pd.DataFrame, strategy_config: TradingStrategyConfig, position_type: int):
         atr = df['atr'].iloc[-2]
         info_tick = mt5.symbol_info_tick(strategy_config.symbol)
@@ -117,7 +117,7 @@ class OrderExecutorThread(BaseThread):
                     timeframe = self.timeframe_mapping[strategy_config.timeframe]
 
                     if not mt5.positions_get(symbol=strategy_config.symbol):
-                        df = self.create_data_frame(strategy_config.symbol, timeframe)
+                        df = self.create_data_frame(strategy_config.symbol, timeframe, window_size=strategy_config.pivot_lookback)
                         
                         result = detector.detect_divergence(df, max_pivot_distance=strategy_config.pivot_distance)
                         if result is not None:

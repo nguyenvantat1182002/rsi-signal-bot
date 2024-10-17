@@ -6,21 +6,9 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>505</width>
-    <height>251</height>
+    <width>431</width>
+    <height>321</height>
    </rect>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>505</width>
-    <height>251</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>505</width>
-    <height>251</height>
-   </size>
   </property>
   <property name="windowTitle">
    <string>TRADER 3 - EDIT</string>
@@ -133,7 +121,7 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>380</x>
+      <x>310</x>
       <y>200</y>
       <width>111</width>
       <height>31</height>
@@ -197,8 +185,8 @@
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>270</x>
-      <y>50</y>
+      <x>10</x>
+      <y>250</y>
       <width>91</width>
       <height>21</height>
      </rect>
@@ -404,9 +392,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>270</x>
-      <y>70</y>
-      <width>101</width>
+      <x>10</x>
+      <y>270</y>
+      <width>151</width>
       <height>31</height>
      </rect>
     </property>
@@ -429,9 +417,9 @@
    <widget class="QSpinBox" name="spinBox_4">
     <property name="geometry">
      <rect>
-      <x>380</x>
-      <y>70</y>
-      <width>111</width>
+      <x>170</x>
+      <y>270</y>
+      <width>91</width>
       <height>31</height>
      </rect>
     </property>
@@ -445,14 +433,46 @@
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>380</x>
-      <y>50</y>
+      <x>170</x>
+      <y>250</y>
       <width>91</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
      <string>Pivot distance</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_7">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>250</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pivot lookback</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="spinBox_5">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>270</y>
+      <width>151</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <number>999999</number>
+    </property>
+    <property name="value">
+     <number>3</number>
     </property>
    </widget>
   </widget>

@@ -27,6 +27,7 @@ class TradingStrategyConfig(BaseModel):
     use_default_volume: bool = False
     use_filter: bool = False
     pivot_distance: int = 9
+    pivot_lookback: int = 5
     
     @field_validator('symbol')
     def symbol_is_not_empty(cls, value: str):
