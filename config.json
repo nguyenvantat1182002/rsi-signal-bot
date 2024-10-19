@@ -8,22 +8,22 @@
         "buy_only": true,
         "sell_only": true,
         "is_running": false,
-        "next_search_signal_time": "2024-10-18T21:00:27.018414",
+        "next_search_signal_time": "2024-10-20T00:25:53.528965",
         "position": {
-            "price_difference": 156.78223117093148,
-            "stop_loss": 68014.17223117093,
-            "take_profit": 67387.0433064872
+            "price_difference": 99.93521747049817,
+            "stop_loss": 68022.1747825295,
+            "take_profit": 68421.9156524115
         },
         "default_volume": 0.01,
         "atr_multiplier": 3.6,
         "risk_reward": 3.0,
         "use_default_volume": true,
         "use_filter": false,
-        "pivot_distance": 20,
+        "pivot_distance": 30,
         "pivot_lookback": 5,
         "atr_length": 14,
         "use_atr_maximun_value": true,
-        "atr_maximun_value": 60
+        "atr_maximun_value": 0.006
     },
     "XAUUSD": {
         "timeframe": "1m",
