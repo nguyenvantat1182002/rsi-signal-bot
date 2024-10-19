@@ -28,6 +28,9 @@ class TradingStrategyConfig(BaseModel):
     use_filter: bool = False
     pivot_distance: int = 9
     pivot_lookback: int = 5
+    atr_length: int = 14
+    use_atr_maximun_value: bool = False
+    atr_maximun_value: int = 0
     
     @field_validator('symbol')
     def symbol_is_not_empty(cls, value: str):

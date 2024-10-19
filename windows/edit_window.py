@@ -30,6 +30,7 @@ class EditWindow(QMainWindow):
         self.lineEdit.textChanged.connect(self.lineEdit_textChanged)
         self.checkBox.stateChanged.connect(self.checkBox_stateChanged)
         self.checkBox_6.stateChanged.connect(self.checkBox_6_stateChanged)
+        self.checkBox_9.stateChanged.connect(self.checkBox_9_stateChanged)
         self.pushButton.clicked.connect(self.pushButton_clicked)
 
         self.symbols_model  = QStandardItemModel()
@@ -66,6 +67,9 @@ class EditWindow(QMainWindow):
 
             self.spinBox_4.setValue(self.strategy_config.pivot_distance)
             self.spinBox_5.setValue(self.strategy_config.pivot_lookback)
+            self.spinBox_6.setValue(self.strategy_config.atr_length)
+            self.checkBox_9.setChecked(self.strategy_config.use_atr_maximun_value)
+            self.spinBox_7.setValue(self.strategy_config.atr_maximun_value)
 
     def checkBox_stateChanged(self):
         value = self.checkBox.isChecked()
@@ -82,6 +86,9 @@ class EditWindow(QMainWindow):
         self.comboBox_3.setEnabled(not value)
         self.label_3.setEnabled(not value)
         self.spinBox_3.setEnabled(not value)
+
+    def checkBox_9_stateChanged(self):
+        self.spinBox_7.setEnabled(self.checkBox_9.isChecked())
 
     def lineEdit_textChanged(self, value: str):
         unit_factor = 0
@@ -109,7 +116,10 @@ class EditWindow(QMainWindow):
             'use_default_volume': self.checkBox_6.isChecked(),
             'use_filter': self.checkBox.isChecked(),
             'pivot_distance': self.spinBox_4.value(),
-            'pivot_lookback': self.spinBox_5.value()
+            'pivot_lookback': self.spinBox_5.value(),
+            'atr_length': self.spinBox_6.value(),
+            'use_atr_maximun_value': self.checkBox_9.isChecked(),
+            'atr_maximun_value': self.spinBox_7.value()
         }
 
         for filter in self.timeframe_checkbox_mapping:

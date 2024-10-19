@@ -47,16 +47,18 @@ class OrderExecutorThread(BaseThread):
 
         return result
 
-    def create_data_frame(self, symbol: str, timeframe: int, count: int = 500, window_size: int = 5) -> pd.DataFrame:
+    def create_data_frame(self, symbol: str, timeframe: int, strategy_config: TradingStrategyConfig, count: int = 500) -> pd.DataFrame:
         rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, count)
 
         df = pd.DataFrame(rates)
         df['time'] = pd.to_datetime(df['time'], unit='s')
 
         df['rsi'] = ta.rsi(df['close'], 14)
-        df['atr'] = ta.atr(df['high'], df['low'], df['close'], 14)
+        df['atr'] = ta.atr(df['high'], df['low'], df['close'], strategy_config.atr_length)
 
         df.dropna(inplace=True)
+
+        window_size = strategy_config.pivot_lookback
 
         df['rsi_pivot_high'] = df['rsi'] == df['rsi'].rolling(2 * window_size + 1, center=True).max()
         df['rsi_pivot_low'] = df['rsi'] == df['rsi'].rolling(2 * window_size + 1, center=True).min()
@@ -82,6 +84,30 @@ class OrderExecutorThread(BaseThread):
 
         return price_difference, trade_volume
     
+    # def determine_order_parameters(self, df: pd.DataFrame, strategy_config: TradingStrategyConfig, divergence_signal: detector.DivergenceSignal):
+    #     pivot_candle = df[df['time'] == divergence_signal.price_point.end[0]].iloc[-1]
+    #     atr = pivot_candle['atr']
+    #     info_tick = mt5.symbol_info_tick(strategy_config.symbol)
+
+    #     order_type_mapping = {
+    #         0: mt5.ORDER_TYPE_BUY,
+    #         1: mt5.ORDER_TYPE_SELL
+    #     }
+    #     entry_mapping = {
+    #         0: info_tick.ask,
+    #         1: info_tick.bid
+    #     }
+    #     stop_loss_mapping = {
+    #         0: pivot_candle['close'] - atr * strategy_config.atr_multiplier,
+    #         1: pivot_candle['close'] + atr * strategy_config.atr_multiplier
+    #     }
+
+    #     return (
+    #         order_type_mapping[divergence_signal.divergence_type],
+    #         entry_mapping[divergence_signal.divergence_type],
+    #         stop_loss_mapping[divergence_signal.divergence_type]
+    #     )
+
     def determine_order_parameters(self, df: pd.DataFrame, strategy_config: TradingStrategyConfig, position_type: int):
         atr = df['atr'].iloc[-2]
         info_tick = mt5.symbol_info_tick(strategy_config.symbol)
@@ -117,8 +143,9 @@ class OrderExecutorThread(BaseThread):
                     timeframe = self.timeframe_mapping[strategy_config.timeframe]
 
                     if not mt5.positions_get(symbol=strategy_config.symbol):
-                        df = self.create_data_frame(strategy_config.symbol, timeframe, window_size=strategy_config.pivot_lookback)
-                        
+                        df = self.create_data_frame(strategy_config.symbol, timeframe, strategy_config)
+                        current_atr = df['atr'].iloc[-1]
+
                         result = detector.detect_divergence(df, max_pivot_distance=strategy_config.pivot_distance)
                         if result is not None:
                             print(strategy_config.symbol, result.divergence_type)
@@ -142,6 +169,10 @@ class OrderExecutorThread(BaseThread):
                                         break
                                 
                                     QThread.msleep(300)
+
+                            if strategy_config.use_atr_maximun_value and current_atr > strategy_config.atr_maximun_value:
+                                buy_only = False
+                                sell_only = False
 
                             trading_allowed = False if not self.multiple_pairs and mt5.positions_total() > 0 else True
 

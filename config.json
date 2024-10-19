@@ -8,11 +8,11 @@
         "buy_only": true,
         "sell_only": true,
         "is_running": false,
-        "next_search_signal_time": "2024-10-17T18:15:28.793880",
+        "next_search_signal_time": "2024-10-18T21:00:27.018414",
         "position": {
-            "price_difference": 121.68780242904904,
-            "stop_loss": 67136.01219757095,
-            "take_profit": 67622.76340728714
+            "price_difference": 156.78223117093148,
+            "stop_loss": 68014.17223117093,
+            "take_profit": 67387.0433064872
         },
         "default_volume": 0.01,
         "atr_multiplier": 3.6,
@@ -20,7 +20,10 @@
         "use_default_volume": true,
         "use_filter": false,
         "pivot_distance": 20,
-        "pivot_lookback": 5
+        "pivot_lookback": 5,
+        "atr_length": 14,
+        "use_atr_maximun_value": true,
+        "atr_maximun_value": 60
     },
     "XAUUSD": {
         "timeframe": "1m",
@@ -31,14 +34,21 @@
         "buy_only": true,
         "sell_only": true,
         "is_running": false,
-        "next_search_signal_time": "2024-10-17T18:15:29.803782",
-        "position": null,
+        "next_search_signal_time": "2024-10-18T21:00:28.033956",
+        "position": {
+            "price_difference": 4.048942696307222,
+            "stop_loss": 2716.322942696307,
+            "take_profit": 2700.127171911078
+        },
         "default_volume": 0.01,
         "atr_multiplier": 3.6,
         "risk_reward": 3.0,
         "use_default_volume": true,
         "use_filter": false,
         "pivot_distance": 20,
-        "pivot_lookback": 5
+        "pivot_lookback": 5,
+        "atr_length": 14,
+        "use_atr_maximun_value": true,
+        "atr_maximun_value": 1
     }
 }
