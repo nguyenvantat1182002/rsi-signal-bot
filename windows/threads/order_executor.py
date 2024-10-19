@@ -151,6 +151,7 @@ class OrderExecutorThread(BaseThread):
                             print(strategy_config.symbol, result.divergence_type)
                             print(result.rsi_point.start, result.rsi_point.end)
                             print(result.price_point.start, result.price_point.end)
+                            print('ATR:', current_atr)
 
                             buy_only = strategy_config.buy_only
                             sell_only = strategy_config.sell_only
