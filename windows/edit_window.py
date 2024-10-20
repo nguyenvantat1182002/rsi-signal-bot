@@ -68,8 +68,9 @@ class EditWindow(QMainWindow):
             self.spinBox_4.setValue(self.strategy_config.pivot_distance)
             self.spinBox_5.setValue(self.strategy_config.pivot_lookback)
             self.spinBox_6.setValue(self.strategy_config.atr_length)
-            self.checkBox_9.setChecked(self.strategy_config.use_atr_maximun_value)
-            self.doubleSpinBox_5.setValue(self.strategy_config.atr_maximun_value)
+            self.checkBox_9.setChecked(self.strategy_config.use_atr_min_max_value)
+            self.doubleSpinBox_5.setValue(self.strategy_config.atr_min_value)
+            self.doubleSpinBox_6.setValue(self.strategy_config.atr_max_value)
 
     def checkBox_stateChanged(self):
         value = self.checkBox.isChecked()
@@ -88,7 +89,9 @@ class EditWindow(QMainWindow):
         self.spinBox_3.setEnabled(not value)
 
     def checkBox_9_stateChanged(self):
-        self.doubleSpinBox_5.setEnabled(self.checkBox_9.isChecked())
+        value = self.checkBox_9.isChecked()
+        self.doubleSpinBox_5.setEnabled(value)
+        self.doubleSpinBox_6.setEnabled(value)
 
     def lineEdit_textChanged(self, value: str):
         unit_factor = 0
@@ -118,8 +121,9 @@ class EditWindow(QMainWindow):
             'pivot_distance': self.spinBox_4.value(),
             'pivot_lookback': self.spinBox_5.value(),
             'atr_length': self.spinBox_6.value(),
-            'use_atr_maximun_value': self.checkBox_9.isChecked(),
-            'atr_maximun_value': self.doubleSpinBox_5.value()
+            'use_atr_min_max_value': self.checkBox_9.isChecked(),
+            'atr_min_value': self.doubleSpinBox_5.value(),
+            'atr_max_value': self.doubleSpinBox_6.value()
         }
 
         for filter in self.timeframe_checkbox_mapping:

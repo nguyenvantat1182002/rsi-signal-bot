@@ -171,7 +171,7 @@ class OrderExecutorThread(BaseThread):
                                 
                                     QThread.msleep(300)
 
-                            if strategy_config.use_atr_maximun_value and current_atr > strategy_config.atr_maximun_value:
+                            if strategy_config.use_atr_min_max_value and not (strategy_config.atr_min_value < current_atr < strategy_config.atr_max_value):
                                 buy_only = False
                                 sell_only = False
 
