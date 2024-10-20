@@ -102,11 +102,10 @@ class OrderExecutorThread(BaseThread):
         if strategy_config.pivot_sl:
             pivot_candle = df[df['time'] == divergence_signal.price_point.end[0]].iloc[-1]
             atr = pivot_candle['atr']
-            entry = pivot_candle['close']
 
         stop_loss_mapping = {
-            0: entry - atr * strategy_config.atr_multiplier,
-            1: entry + atr * strategy_config.atr_multiplier
+            0: (pivot_candle['close'] if strategy_config.pivot_sl else entry) - atr * strategy_config.atr_multiplier,
+            1: (pivot_candle['close'] if strategy_config.pivot_sl else entry) + atr * strategy_config.atr_multiplier
         }
 
         return (
