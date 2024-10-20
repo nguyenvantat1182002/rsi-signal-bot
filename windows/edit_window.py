@@ -71,6 +71,7 @@ class EditWindow(QMainWindow):
             self.checkBox_9.setChecked(self.strategy_config.use_atr_min_max_value)
             self.doubleSpinBox_5.setValue(self.strategy_config.atr_min_value)
             self.doubleSpinBox_6.setValue(self.strategy_config.atr_max_value)
+            self.checkBox_10.setChecked(self.strategy_config.pivot_sl)
 
     def checkBox_stateChanged(self):
         value = self.checkBox.isChecked()
@@ -123,7 +124,8 @@ class EditWindow(QMainWindow):
             'atr_length': self.spinBox_6.value(),
             'use_atr_min_max_value': self.checkBox_9.isChecked(),
             'atr_min_value': self.doubleSpinBox_5.value(),
-            'atr_max_value': self.doubleSpinBox_6.value()
+            'atr_max_value': self.doubleSpinBox_6.value(),
+            'pivot_sl': self.checkBox_10.isChecked()
         }
 
         for filter in self.timeframe_checkbox_mapping:

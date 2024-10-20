@@ -85,8 +85,7 @@ class OrderExecutorThread(BaseThread):
         return price_difference, trade_volume
     
     def determine_order_parameters(self, df: pd.DataFrame, strategy_config: TradingStrategyConfig, divergence_signal: detector.DivergenceSignal):
-        pivot_candle = df[df['time'] == divergence_signal.price_point.end[0]].iloc[-1]
-        atr = pivot_candle['atr']
+        atr = df['atr'].iloc[-2]
         info_tick = mt5.symbol_info_tick(strategy_config.symbol)
 
         order_type_mapping = {
@@ -97,31 +96,24 @@ class OrderExecutorThread(BaseThread):
             0: info_tick.ask,
             1: info_tick.bid
         }
+
+        entry = entry_mapping[divergence_signal.divergence_type]
+
+        if strategy_config.pivot_sl:
+            pivot_candle = df[df['time'] == divergence_signal.price_point.end[0]].iloc[-1]
+            atr = pivot_candle['atr']
+            entry = pivot_candle['close']
+
         stop_loss_mapping = {
-            0: pivot_candle['close'] - atr * strategy_config.atr_multiplier,
-            1: pivot_candle['close'] + atr * strategy_config.atr_multiplier
+            0: entry - atr * strategy_config.atr_multiplier,
+            1: entry + atr * strategy_config.atr_multiplier
         }
 
         return (
             order_type_mapping[divergence_signal.divergence_type],
-            entry_mapping[divergence_signal.divergence_type],
+            entry,
             stop_loss_mapping[divergence_signal.divergence_type]
         )
-
-    # def determine_order_parameters(self, df: pd.DataFrame, strategy_config: TradingStrategyConfig, position_type: int):
-    #     atr = df['atr'].iloc[-2]
-    #     info_tick = mt5.symbol_info_tick(strategy_config.symbol)
-
-    #     order_type = mt5.ORDER_TYPE_BUY
-    #     entry = info_tick.ask
-    #     stop_loss = entry - atr * strategy_config.atr_multiplier
-
-    #     if position_type == 1:
-    #         order_type = mt5.ORDER_TYPE_SELL
-    #         entry = info_tick.bid
-    #         stop_loss = entry + atr * strategy_config.atr_multiplier
-            
-    #     return order_type, entry, stop_loss
 
     def get_risk_amount(self, strategy_config: TradingStrategyConfig) -> float:
         risk_amount = strategy_config.risk_amount

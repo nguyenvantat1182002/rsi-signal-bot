@@ -32,6 +32,7 @@ class TradingStrategyConfig(BaseModel):
     use_atr_min_max_value: bool = False
     atr_min_value: float = 0.00001
     atr_max_value: float = 0.00001
+    pivot_sl: bool = False
     
     @field_validator('symbol')
     def symbol_is_not_empty(cls, value: str):

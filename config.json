@@ -24,7 +24,8 @@
         "atr_length": 14,
         "use_atr_min_max_value": false,
         "atr_min_value": 1e-05,
-        "atr_max_value": 63.5
+        "atr_max_value": 63.5,
+        "pivot_sl": true
     },
     "XAUUSD": {
         "timeframe": "1m",
@@ -49,7 +50,9 @@
         "pivot_distance": 20,
         "pivot_lookback": 5,
         "atr_length": 14,
-        "use_atr_maximun_value": true,
-        "atr_maximun_value": 1
+        "use_atr_min_max_value": false,
+        "atr_min_value": 1e-05,
+        "atr_max_value": 1e-05,
+        "pivot_sl": false
     }
 }
