@@ -84,44 +84,44 @@ class OrderExecutorThread(BaseThread):
 
         return price_difference, trade_volume
     
-    # def determine_order_parameters(self, df: pd.DataFrame, strategy_config: TradingStrategyConfig, divergence_signal: detector.DivergenceSignal):
-    #     pivot_candle = df[df['time'] == divergence_signal.price_point.end[0]].iloc[-1]
-    #     atr = pivot_candle['atr']
-    #     info_tick = mt5.symbol_info_tick(strategy_config.symbol)
-
-    #     order_type_mapping = {
-    #         0: mt5.ORDER_TYPE_BUY,
-    #         1: mt5.ORDER_TYPE_SELL
-    #     }
-    #     entry_mapping = {
-    #         0: info_tick.ask,
-    #         1: info_tick.bid
-    #     }
-    #     stop_loss_mapping = {
-    #         0: pivot_candle['close'] - atr * strategy_config.atr_multiplier,
-    #         1: pivot_candle['close'] + atr * strategy_config.atr_multiplier
-    #     }
-
-    #     return (
-    #         order_type_mapping[divergence_signal.divergence_type],
-    #         entry_mapping[divergence_signal.divergence_type],
-    #         stop_loss_mapping[divergence_signal.divergence_type]
-    #     )
-
-    def determine_order_parameters(self, df: pd.DataFrame, strategy_config: TradingStrategyConfig, position_type: int):
-        atr = df['atr'].iloc[-2]
+    def determine_order_parameters(self, df: pd.DataFrame, strategy_config: TradingStrategyConfig, divergence_signal: detector.DivergenceSignal):
+        pivot_candle = df[df['time'] == divergence_signal.price_point.end[0]].iloc[-1]
+        atr = pivot_candle['atr']
         info_tick = mt5.symbol_info_tick(strategy_config.symbol)
 
-        order_type = mt5.ORDER_TYPE_BUY
-        entry = info_tick.ask
-        stop_loss = entry - atr * strategy_config.atr_multiplier
+        order_type_mapping = {
+            0: mt5.ORDER_TYPE_BUY,
+            1: mt5.ORDER_TYPE_SELL
+        }
+        entry_mapping = {
+            0: info_tick.ask,
+            1: info_tick.bid
+        }
+        stop_loss_mapping = {
+            0: pivot_candle['close'] - atr * strategy_config.atr_multiplier,
+            1: pivot_candle['close'] + atr * strategy_config.atr_multiplier
+        }
 
-        if position_type == 1:
-            order_type = mt5.ORDER_TYPE_SELL
-            entry = info_tick.bid
-            stop_loss = entry + atr * strategy_config.atr_multiplier
+        return (
+            order_type_mapping[divergence_signal.divergence_type],
+            entry_mapping[divergence_signal.divergence_type],
+            stop_loss_mapping[divergence_signal.divergence_type]
+        )
+
+    # def determine_order_parameters(self, df: pd.DataFrame, strategy_config: TradingStrategyConfig, position_type: int):
+    #     atr = df['atr'].iloc[-2]
+    #     info_tick = mt5.symbol_info_tick(strategy_config.symbol)
+
+    #     order_type = mt5.ORDER_TYPE_BUY
+    #     entry = info_tick.ask
+    #     stop_loss = entry - atr * strategy_config.atr_multiplier
+
+    #     if position_type == 1:
+    #         order_type = mt5.ORDER_TYPE_SELL
+    #         entry = info_tick.bid
+    #         stop_loss = entry + atr * strategy_config.atr_multiplier
             
-        return order_type, entry, stop_loss
+    #     return order_type, entry, stop_loss
 
     def get_risk_amount(self, strategy_config: TradingStrategyConfig) -> float:
         risk_amount = strategy_config.risk_amount
@@ -178,7 +178,7 @@ class OrderExecutorThread(BaseThread):
                             trading_allowed = False if not self.multiple_pairs and mt5.positions_total() > 0 else True
 
                             if trading_allowed and ((result.divergence_type == 0 and buy_only) or (result.divergence_type == 1 and sell_only)):
-                                order_type, entry, stop_loss = self.determine_order_parameters(df, strategy_config, result.divergence_type)
+                                order_type, entry, stop_loss = self.determine_order_parameters(df, strategy_config, result)
                                 risk_amount = self.get_risk_amount(strategy_config)
                                 price_difference, trade_volume = self.get_trade_volume(strategy_config, entry, stop_loss, risk_amount)
 
