@@ -3,6 +3,7 @@ import pandas as pd
 import detector
 import pandas_ta as ta
 
+from typing import Tuple
 from datetime import datetime, timedelta
 from windows.models import TradingStrategyConfig, Position
 from PyQt5.QtCore import QReadWriteLock, QThread
@@ -71,9 +72,9 @@ class OrderExecutorThread(BaseThread):
                          strategy_config: TradingStrategyConfig,
                          entry: float,
                          stop_loss: float,
-                         risk_amount: float) -> float:
-        price_difference = abs(entry - stop_loss)
-        trade_volume = risk_amount / price_difference
+                         risk_amount: float) -> Tuple[float, float]:
+        price_gap = abs(entry - stop_loss)
+        trade_volume = risk_amount / price_gap
 
         if strategy_config.unit_factor != 0:
             trade_volume = int(trade_volume)
@@ -82,37 +83,59 @@ class OrderExecutorThread(BaseThread):
         minimum_volume = 0.01
         trade_volume = round(trade_volume, 2) if trade_volume >= minimum_volume else minimum_volume
 
-        return price_difference, trade_volume
+        return price_gap, trade_volume
     
-    def determine_order_parameters(self, df: pd.DataFrame, strategy_config: TradingStrategyConfig, divergence_signal: detector.DivergenceSignal):
-        atr = df['atr'].iloc[-2]
+    def determine_order_parameters(self,
+                                   df: pd.DataFrame,
+                                   strategy_config: TradingStrategyConfig,
+                                   divergence_signal: detector.DivergenceSignal) -> Tuple[float, float, float]:
         info_tick = mt5.symbol_info_tick(strategy_config.symbol)
 
         order_type_mapping = {
             0: mt5.ORDER_TYPE_BUY,
             1: mt5.ORDER_TYPE_SELL
         }
+
         entry_mapping = {
             0: info_tick.ask,
             1: info_tick.bid
         }
 
+        pivot_candle = df[df['time'] == divergence_signal.price_point.end[0]].iloc[-1]
+        atr = df['atr'].iloc[-2]
         entry = entry_mapping[divergence_signal.divergence_type]
+        gaps = []
+        
+        for atr, entry in [[atr, entry],
+                           [pivot_candle['atr'], pivot_candle['close']]]:
+            stop_loss_mapping = {
+                0: entry - atr * strategy_config.atr_multiplier,
+                1: entry + atr * strategy_config.atr_multiplier
+            }
+            stop_loss = stop_loss_mapping[divergence_signal.divergence_type]
+            
+            if not strategy_config.use_sl_maximum:
+                return (
+                    order_type_mapping[divergence_signal.divergence_type],
+                    entry,
+                    stop_loss
+                )
+            
+            gaps.append(abs(entry - stop_loss))
 
-        if strategy_config.pivot_sl:
-            pivot_candle = df[df['time'] == divergence_signal.price_point.end[0]].iloc[-1]
-            atr = pivot_candle['atr']
-
-        stop_loss_mapping = {
-            0: (pivot_candle['close'] if strategy_config.pivot_sl else entry) - atr * strategy_config.atr_multiplier,
-            1: (pivot_candle['close'] if strategy_config.pivot_sl else entry) + atr * strategy_config.atr_multiplier
-        }
-
-        return (
-            order_type_mapping[divergence_signal.divergence_type],
-            entry,
-            stop_loss_mapping[divergence_signal.divergence_type]
-        )
+        if any(gap > strategy_config.max_price for gap in gaps):
+            max_gap = max(gaps)
+            stop_loss_mapping = {
+                0: entry - max_gap,
+                1: entry + max_gap
+            }
+            return (
+                order_type_mapping[divergence_signal.divergence_type],
+                entry,
+                stop_loss_mapping[divergence_signal.divergence_type]
+            )
+        
+        return None
 
     def get_risk_amount(self, strategy_config: TradingStrategyConfig) -> float:
         risk_amount = strategy_config.risk_amount
@@ -162,19 +185,20 @@ class OrderExecutorThread(BaseThread):
                                 
                                     QThread.msleep(300)
 
-                            if strategy_config.use_atr_min_max_value and not (strategy_config.atr_min_value < current_atr < strategy_config.atr_max_value):
+                            params = self.determine_order_parameters(df, strategy_config, result)
+                            if strategy_config.use_sl_maximum and not params:
                                 buy_only = False
                                 sell_only = False
 
                             trading_allowed = False if not self.multiple_pairs and mt5.positions_total() > 0 else True
 
                             if trading_allowed and ((result.divergence_type == 0 and buy_only) or (result.divergence_type == 1 and sell_only)):
-                                order_type, entry, stop_loss = self.determine_order_parameters(df, strategy_config, result)
+                                order_type, entry, stop_loss = params
                                 risk_amount = self.get_risk_amount(strategy_config)
-                                price_difference, trade_volume = self.get_trade_volume(strategy_config, entry, stop_loss, risk_amount)
+                                price_gap, trade_volume = self.get_trade_volume(strategy_config, entry, stop_loss, risk_amount)
 
                                 strategy_config.position = Position()
-                                strategy_config.position.price_difference = price_difference
+                                strategy_config.position.price_gap = price_gap
                                 strategy_config.position.stop_loss = stop_loss
                                 strategy_config.position.take_profit = self.get_take_profit_price(result.divergence_type, strategy_config, entry)
 

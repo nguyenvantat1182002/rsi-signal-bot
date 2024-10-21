@@ -4,7 +4,7 @@ from pydantic import BaseModel, field_validator, Field
 
 
 class Position(BaseModel):
-    price_difference: float = -1
+    price_gap: float = -1
     stop_loss: float = -1
     take_profit: float = -1
 
@@ -29,10 +29,8 @@ class TradingStrategyConfig(BaseModel):
     pivot_distance: int = 9
     pivot_lookback: int = 5
     atr_length: int = 14
-    use_atr_min_max_value: bool = False
-    atr_min_value: float = 0.00001
-    atr_max_value: float = 0.00001
-    pivot_sl: bool = False
+    use_sl_maximum: bool = False
+    max_price: float = 0.00001
     
     @field_validator('symbol')
     def symbol_is_not_empty(cls, value: str):
