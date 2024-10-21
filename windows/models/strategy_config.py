@@ -29,8 +29,9 @@ class TradingStrategyConfig(BaseModel):
     pivot_distance: int = 9
     pivot_lookback: int = 5
     atr_length: int = 14
-    use_sl_maximum: bool = False
-    max_price: float = 0.00001
+    use_sl_min_max: bool = False
+    sl_min_price: float = 50.00000
+    sl_max_price: float = 200.00000
     
     @field_validator('symbol')
     def symbol_is_not_empty(cls, value: str):

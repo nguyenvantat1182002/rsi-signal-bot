@@ -68,8 +68,9 @@ class EditWindow(QMainWindow):
             self.spinBox_4.setValue(self.strategy_config.pivot_distance)
             self.spinBox_5.setValue(self.strategy_config.pivot_lookback)
             self.spinBox_6.setValue(self.strategy_config.atr_length)
-            self.checkBox_9.setChecked(self.strategy_config.use_sl_maximum)
-            self.doubleSpinBox_5.setValue(self.strategy_config.max_price)
+            self.checkBox_9.setChecked(self.strategy_config.use_sl_min_max)
+            self.doubleSpinBox_5.setValue(self.strategy_config.sl_min_price)
+            self.doubleSpinBox_6.setValue(self.strategy_config.sl_max_price)
 
     def checkBox_stateChanged(self):
         value = self.checkBox.isChecked()
@@ -118,8 +119,9 @@ class EditWindow(QMainWindow):
             'pivot_distance': self.spinBox_4.value(),
             'pivot_lookback': self.spinBox_5.value(),
             'atr_length': self.spinBox_6.value(),
-            'use_sl_maximum': self.checkBox_9.isChecked(),
-            'max_price': self.doubleSpinBox_5.value(),
+            'use_sl_min_max': self.checkBox_9.isChecked(),
+            'sl_min_price': self.doubleSpinBox_5.value(),
+            'sl_max_price': self.doubleSpinBox_6.value(),
         }
 
         for filter in self.timeframe_checkbox_mapping:
