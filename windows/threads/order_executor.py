@@ -123,8 +123,6 @@ class OrderExecutorThread(BaseThread):
             
             gaps.append(abs(entry - stop_loss))
 
-        print(gaps)
-
         if any(strategy_config.sl_min_price < gap < strategy_config.sl_max_price for gap in gaps):
             max_gap = max(gaps)
             stop_loss_mapping = {
