@@ -124,10 +124,10 @@ class OrderExecutorThread(BaseThread):
             gaps.append(abs(entry - stop_loss))
 
         if any(strategy_config.sl_min_price < gap < strategy_config.sl_max_price for gap in gaps):
-            max_gap = max(gaps)
+            gap = min(gaps)
             stop_loss_mapping = {
-                0: entry - max_gap,
-                1: entry + max_gap
+                0: entry - gap,
+                1: entry + gap
             }
             return (
                 order_type_mapping[divergence_signal.divergence_type],

@@ -8,7 +8,7 @@
         "buy_only": true,
         "sell_only": true,
         "is_running": true,
-        "next_search_signal_time": "2024-10-21T21:32:40.630800",
+        "next_search_signal_time": "2024-10-22T00:28:05.133765",
         "position": null,
         "default_volume": 0.01,
         "atr_multiplier": 3.6,
@@ -19,7 +19,7 @@
         "pivot_lookback": 5,
         "atr_length": 14,
         "use_sl_min_max": true,
-        "sl_min_price": 50.0,
+        "sl_min_price": 60.0,
         "sl_max_price": 200.0
     }
 }

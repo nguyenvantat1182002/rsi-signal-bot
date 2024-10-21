@@ -133,20 +133,19 @@ class MainWindow(QMainWindow):
             mt5.ORDER_TYPE_SELL: mt5.ORDER_TYPE_BUY
         }
 
-        tick_info = mt5.symbol_info_tick(symbol)
-        price = {
-            mt5.ORDER_TYPE_BUY: tick_info.bid,
-            mt5.ORDER_TYPE_SELL: tick_info.ask
-        }
-
         for position in positions:
+            tick_info = mt5.symbol_info_tick(symbol)
+            price_mapping = {
+                mt5.ORDER_TYPE_BUY: tick_info.bid,
+                mt5.ORDER_TYPE_SELL: tick_info.ask
+            }
             request = {
                 'action': mt5.TRADE_ACTION_DEAL,
                 'position': position.ticket,
                 'symbol': position.symbol,
                 "volume": position.volume,
                 'type': position_type[position.type],
-                'price': price[position.type],
+                'price': price_mapping[position.type],
                 'deviation': 30,
                 "type_time": mt5.ORDER_TIME_GTC
             }
