@@ -114,7 +114,7 @@ class OrderExecutorThread(BaseThread):
             }
             stop_loss = stop_loss_mapping[divergence_signal.divergence_type]
             
-            if not strategy_config.use_sl_maximum:
+            if not strategy_config.use_sl_min_max:
                 return (
                     order_type_mapping[divergence_signal.divergence_type],
                     entry,
@@ -122,6 +122,8 @@ class OrderExecutorThread(BaseThread):
                 )
             
             gaps.append(abs(entry - stop_loss))
+
+        print(gaps)
 
         if any(strategy_config.sl_min_price < gap < strategy_config.sl_max_price for gap in gaps):
             max_gap = max(gaps)
@@ -186,14 +188,16 @@ class OrderExecutorThread(BaseThread):
                                     QThread.msleep(300)
 
                             params = self.determine_order_parameters(df, strategy_config, result)
-                            if strategy_config.use_sl_maximum and not params:
+                            if strategy_config.use_sl_min_max and not params:
                                 buy_only = False
                                 sell_only = False
 
+                            order_type, entry, stop_loss = params
                             trading_allowed = False if not self.multiple_pairs and mt5.positions_total() > 0 else True
 
+                            print('Price gap:', abs(entry - stop_loss))
+
                             if trading_allowed and ((result.divergence_type == 0 and buy_only) or (result.divergence_type == 1 and sell_only)):
-                                order_type, entry, stop_loss = params
                                 risk_amount = self.get_risk_amount(strategy_config)
                                 price_gap, trade_volume = self.get_trade_volume(strategy_config, entry, stop_loss, risk_amount)
 
