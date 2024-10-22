@@ -89,13 +89,12 @@ class OrderExecutorThread(BaseThread):
                                    df: pd.DataFrame,
                                    strategy_config: TradingStrategyConfig,
                                    divergence_signal: detector.DivergenceSignal) -> Tuple[float, float, float]:
-        info_tick = mt5.symbol_info_tick(strategy_config.symbol)
-
         order_type_mapping = {
             0: mt5.ORDER_TYPE_BUY,
             1: mt5.ORDER_TYPE_SELL
         }
 
+        info_tick = mt5.symbol_info_tick(strategy_config.symbol)
         entry_mapping = {
             0: info_tick.ask,
             1: info_tick.bid
@@ -123,8 +122,15 @@ class OrderExecutorThread(BaseThread):
             
             gaps.append(abs(entry - stop_loss))
 
+        print('Gaps:', gaps)
+
         if any(strategy_config.sl_min_price < gap < strategy_config.sl_max_price for gap in gaps):
             gap = min(gaps)
+            max_gap = max(gaps)
+
+            if strategy_config.sl_min_price < max_gap < strategy_config.sl_max_price:
+                gap = max_gap
+
             stop_loss_mapping = {
                 0: entry - gap,
                 1: entry + gap
@@ -158,14 +164,12 @@ class OrderExecutorThread(BaseThread):
 
                     if not mt5.positions_get(symbol=strategy_config.symbol):
                         df = self.create_data_frame(strategy_config.symbol, timeframe, strategy_config)
-                        current_atr = df['atr'].iloc[-1]
-
+                        
                         result = detector.detect_divergence(df, max_pivot_distance=strategy_config.pivot_distance)
                         if result is not None:
                             print(strategy_config.symbol, result.divergence_type)
                             print(result.rsi_point.start, result.rsi_point.end)
                             print(result.price_point.start, result.price_point.end)
-                            print('ATR:', current_atr)
 
                             buy_only = strategy_config.buy_only
                             sell_only = strategy_config.sell_only
@@ -190,12 +194,10 @@ class OrderExecutorThread(BaseThread):
                                 buy_only = False
                                 sell_only = False
 
-                            order_type, entry, stop_loss = params
                             trading_allowed = False if not self.multiple_pairs and mt5.positions_total() > 0 else True
 
-                            print('Price gap:', abs(entry - stop_loss))
-
                             if trading_allowed and ((result.divergence_type == 0 and buy_only) or (result.divergence_type == 1 and sell_only)):
+                                order_type, entry, stop_loss = params
                                 risk_amount = self.get_risk_amount(strategy_config)
                                 price_gap, trade_volume = self.get_trade_volume(strategy_config, entry, stop_loss, risk_amount)
 

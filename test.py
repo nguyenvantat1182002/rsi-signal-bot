@@ -1,8 +1,14 @@
-import MetaTrader5 as mt5
-import gymnasium as gym
-import gym_anytrading
-import pandas as pd
-import pandas_ta as ta
 
 
-mt5.initialize()
+v = []
+
+for i in range(20):
+    if not v:
+        v.append(0.02)
+    elif len(v) < 2:
+        v.append(v[0] * 2)
+    else:
+        v.append(round(v[-2] + v[-1], 2))
+
+print(v)
+

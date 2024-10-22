@@ -33,7 +33,7 @@ class BaseThread(QThread):
         return mt5.order_send(request)
     
     def get_take_profit_price(self, position_type: int, strategy_config: TradingStrategyConfig, entry: float) -> float:
-        price_difference = strategy_config.position.price_difference * strategy_config.risk_reward
+        price_difference = strategy_config.position.price_gap * strategy_config.risk_reward
 
         take_profit = {
             0: entry + price_difference,
