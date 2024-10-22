@@ -125,8 +125,12 @@ class OrderExecutorThread(BaseThread):
         print('Gaps:', gaps)
 
         if any(strategy_config.sl_min_price < gap < strategy_config.sl_max_price for gap in gaps):
-            gap = min(gaps)
+            gap = strategy_config.sl_max_price
+            min_gap = min(gaps)
             max_gap = max(gaps)
+
+            if strategy_config.sl_min_price < min_gap < strategy_config.sl_max_price:
+                gap = min_gap
 
             if strategy_config.sl_min_price < max_gap < strategy_config.sl_max_price:
                 gap = max_gap
