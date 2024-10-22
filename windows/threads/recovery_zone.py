@@ -22,8 +22,12 @@ class RecoveryZoneThread(BaseThread):
                         
                         if not mt5.orders_get(symbol=key):
                             entry = strategy_config.position.stop_loss if lastest_position.type == positions[0].type else positions[0].price_open
-                            trade_volume = round(lastest_position.volume * 2 if len(positions) < 2 else positions[-2].volume + positions[-1].volume, 2)
                             take_profit = self.get_take_profit_price(self.toggle_mapping[lastest_position.type], strategy_config, entry)
+                            
+                            trade_volume = lastest_position.volume * 2
+                            if len(positions) > 1:
+                                trade_volume = positions[-2].volume + positions[-1].volume
+                            trade_volume = round(trade_volume, 2)
 
                             result = self.create_buy_sell_stop_order(
                                 symbol=strategy_config.symbol,
