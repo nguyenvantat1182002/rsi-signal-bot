@@ -124,13 +124,9 @@ class OrderExecutorThread(BaseThread):
 
         print('Gaps:', gaps)
 
-        if any(strategy_config.sl_min_price < gap < strategy_config.sl_max_price for gap in gaps):
-            gap = strategy_config.sl_max_price
-            
-            for item in gaps:
-                if strategy_config.sl_min_price < item < strategy_config.sl_max_price:
-                    gap = item
-
+        valid_gaps = list(filter(lambda x: strategy_config.sl_min_price < x < strategy_config.sl_max_price, gaps))
+        if valid_gaps:
+            gap = gap[-1] if len(valid_gaps) < 2 else max(valid_gaps)
             stop_loss_mapping = {
                 0: entry - gap,
                 1: entry + gap
@@ -140,7 +136,7 @@ class OrderExecutorThread(BaseThread):
                 entry,
                 stop_loss_mapping[divergence_signal.divergence_type]
             )
-        
+
         return None
 
     def get_risk_amount(self, strategy_config: TradingStrategyConfig) -> float:
