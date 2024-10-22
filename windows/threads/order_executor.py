@@ -72,7 +72,7 @@ class OrderExecutorThread(BaseThread):
                          strategy_config: TradingStrategyConfig,
                          entry: float,
                          stop_loss: float,
-                         risk_amount: float) -> Tuple[float, float]:
+                         risk_amount: float) -> float:
         price_gap = abs(entry - stop_loss)
         trade_volume = risk_amount / price_gap
 
@@ -83,7 +83,7 @@ class OrderExecutorThread(BaseThread):
         minimum_volume = 0.01
         trade_volume = round(trade_volume, 2) if trade_volume >= minimum_volume else minimum_volume
 
-        return price_gap, trade_volume
+        return trade_volume
     
     def determine_order_parameters(self,
                                    df: pd.DataFrame,
@@ -195,12 +195,7 @@ class OrderExecutorThread(BaseThread):
                             if trading_allowed and ((result.divergence_type == 0 and buy_only) or (result.divergence_type == 1 and sell_only)):
                                 order_type, entry, stop_loss = params
                                 risk_amount = self.get_risk_amount(strategy_config)
-                                price_gap, trade_volume = self.get_trade_volume(strategy_config, entry, stop_loss, risk_amount)
-
-                                strategy_config.position = Position()
-                                strategy_config.position.price_gap = price_gap
-                                strategy_config.position.stop_loss = stop_loss
-                                strategy_config.position.take_profit = self.get_take_profit_price(result.divergence_type, strategy_config, entry)
+                                trade_volume = self.get_trade_volume(strategy_config, entry, stop_loss, risk_amount)
 
                                 request = {
                                     'symbol': strategy_config.symbol,
@@ -209,7 +204,6 @@ class OrderExecutorThread(BaseThread):
                                     'type': order_type,
                                     'volume': trade_volume,
                                     'price': entry,
-                                    'tp': strategy_config.position.take_profit
                                 }
 
                                 if strategy_config.use_default_volume:
@@ -221,6 +215,23 @@ class OrderExecutorThread(BaseThread):
                                 if not result.retcode == mt5.TRADE_RETCODE_DONE:
                                     print(__class__.__name__ + ':', 'Stop')
                                     return
+                                
+                                strategy_config.position = Position()
+                                strategy_config.position.price_gap = abs(result.price - stop_loss)
+
+                                stop_loss_mapping = {
+                                    mt5.ORDER_TYPE_BUY: result.price - strategy_config.position.price_gap,
+                                    mt5.ORDER_TYPE_SELL: result.price + strategy_config.position.price_gap
+                                }
+                                strategy_config.position.stop_loss = stop_loss_mapping[order_type]
+                                strategy_config.position.take_profit = self.get_take_profit_price(order_type, strategy_config, result.price)
+
+                                request = {
+                                    'action': mt5.TRADE_ACTION_SLTP,
+                                    'position': result.order,
+                                    'tp': strategy_config.position.take_profit
+                                }
+                                mt5.order_send(request)
                                     
                             print()
 

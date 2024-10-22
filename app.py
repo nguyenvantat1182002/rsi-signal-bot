@@ -6,7 +6,8 @@ from windows import MainWindow
 
 VERSION = 4
 
-path = input('Path: ')
+# path = input('Path: ')
+path = r"C:\Program Files\MetaTrader 5 EXNESS\terminal64.exe"
 
 if mt5.initialize(path=path):
     app = QApplication([])

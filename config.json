@@ -7,8 +7,8 @@
         "unit_factor": 0,
         "buy_only": true,
         "sell_only": true,
-        "is_running": true,
-        "next_search_signal_time": "2024-10-22T19:30:54.831784",
+        "is_running": false,
+        "next_search_signal_time": "2024-10-22T21:04:26.866022",
         "position": null,
         "default_volume": 0.02,
         "atr_multiplier": 3.6,
@@ -20,7 +20,7 @@
         "atr_length": 14,
         "use_sl_min_max": true,
         "sl_min_price": 60.0,
-        "sl_max_price": 201.0
+        "sl_max_price": 220.0
     },
     "XAUUSD": {
         "timeframe": "1m",
@@ -30,8 +30,8 @@
         "unit_factor": 100,
         "buy_only": true,
         "sell_only": true,
-        "is_running": true,
-        "next_search_signal_time": "2024-10-22T19:30:55.842902",
+        "is_running": false,
+        "next_search_signal_time": "2024-10-22T21:04:27.893696",
         "position": null,
         "default_volume": 0.02,
         "atr_multiplier": 3.6,
@@ -41,7 +41,7 @@
         "pivot_distance": 30,
         "pivot_lookback": 5,
         "atr_length": 14,
-        "use_sl_min_max": true,
+        "use_sl_min_max": false,
         "sl_min_price": 1.2,
         "sl_max_price": 2.1
     }
