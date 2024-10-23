@@ -7,9 +7,13 @@
         "unit_factor": 0,
         "buy_only": true,
         "sell_only": true,
-        "is_running": false,
-        "next_search_signal_time": "2024-10-22T21:04:26.866022",
-        "position": null,
+        "is_running": true,
+        "next_search_signal_time": "2024-10-23T14:40:55.902309",
+        "position": {
+            "price_gap": 170.45064792873745,
+            "stop_loss": 66719.50935207127,
+            "take_profit": 67401.31194378622
+        },
         "default_volume": 0.02,
         "atr_multiplier": 3.6,
         "risk_reward": 3.0,
@@ -18,7 +22,7 @@
         "pivot_distance": 30,
         "pivot_lookback": 5,
         "atr_length": 14,
-        "use_sl_min_max": true,
+        "use_sl_min_max": false,
         "sl_min_price": 60.0,
         "sl_max_price": 220.0
     },
@@ -30,9 +34,13 @@
         "unit_factor": 100,
         "buy_only": true,
         "sell_only": true,
-        "is_running": false,
-        "next_search_signal_time": "2024-10-22T21:04:27.893696",
-        "position": null,
+        "is_running": true,
+        "next_search_signal_time": "2024-10-23T14:40:56.908396",
+        "position": {
+            "price_gap": 2.96544583045079,
+            "stop_loss": 2749.350445830451,
+            "take_profit": 2737.488662508648
+        },
         "default_volume": 0.02,
         "atr_multiplier": 3.6,
         "risk_reward": 3.0,

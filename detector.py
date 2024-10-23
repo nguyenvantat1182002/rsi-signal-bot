@@ -17,18 +17,6 @@ class DivergenceSignal:
     price_point: DivergencePoint
 
 
-def is_highest_pivot(df: pd.DataFrame, pivot_1: pd.Series, pivot_2: pd.Series) -> bool:
-    tmp = df[(df['time'] >= pivot_1['time']) & (df['time'] <= pivot_2['time'])]
-    highest_candle = tmp.nlargest(1, 'high').iloc[-1]
-    return highest_candle['time'] == pivot_2['time']
-
-
-def is_lowest_pivot(df: pd.DataFrame, pivot_1: pd.Series, pivot_2: pd.Series) -> bool:
-    tmp = df[(df['time'] >= pivot_1['time']) & (df['time'] <= pivot_2['time'])]
-    lowest_candle = tmp.nsmallest(1, 'low').iloc[-1]
-    return lowest_candle['time'] == pivot_2['time']
-
-
 def get_highest_pivot_bar(df: pd.DataFrame, pivot_candle: pd.Series, window_size: int = 5) -> pd.Series:
     left_bars = df[df['time'] < pivot_candle['time']].tail(window_size)
     right_bars = df[df['time'] > pivot_candle['time']].head(window_size)
@@ -72,15 +60,13 @@ def is_bearish_divergence(df: pd.DataFrame, current_pivot_high: pd.Series) -> Op
         
     if not nearest_rsi_pivot_high.empty:
         nearest_rsi_pivot_high = nearest_rsi_pivot_high.iloc[-1]
-
-        if is_highest_pivot(df, nearest_rsi_pivot_high, current_pivot_high):
         
-            current_pivot_high_candle = get_highest_pivot_bar(df, current_pivot_high)
-            nearest_pivot_high_candle = get_highest_pivot_bar(df, nearest_rsi_pivot_high)
+        current_pivot_high_candle = get_highest_pivot_bar(df, current_pivot_high)
+        nearest_pivot_high_candle = get_highest_pivot_bar(df, nearest_rsi_pivot_high)
 
-            if current_pivot_high_candle is not None and nearest_pivot_high_candle is not None:
-                if current_pivot_high_candle['high'] > nearest_pivot_high_candle['high']:
-                    return nearest_rsi_pivot_high
+        if current_pivot_high_candle is not None and nearest_pivot_high_candle is not None:
+            if current_pivot_high_candle['high'] > nearest_pivot_high_candle['high']:
+                return nearest_rsi_pivot_high
     
     return None
 
@@ -90,15 +76,12 @@ def is_bullish_divergence(df: pd.DataFrame, current_pivot_low: pd.Series) -> Opt
     if not nearest_rsi_pivot_low.empty:
         nearest_rsi_pivot_low = nearest_rsi_pivot_low.iloc[-1]
 
+        current_pivot_low_candle = get_lowest_pivot_bar(df, current_pivot_low)
+        nearest_pivot_low_candle = get_lowest_pivot_bar(df, nearest_rsi_pivot_low)
 
-        if is_lowest_pivot(df, nearest_rsi_pivot_low, current_pivot_low):
-
-            current_pivot_low_candle = get_lowest_pivot_bar(df, current_pivot_low)
-            nearest_pivot_low_candle = get_lowest_pivot_bar(df, nearest_rsi_pivot_low)
-
-            if current_pivot_low_candle is not None and nearest_pivot_low_candle is not None:
-                if current_pivot_low['low'] < nearest_pivot_low_candle['low']:
-                    return nearest_rsi_pivot_low
+        if current_pivot_low_candle is not None and nearest_pivot_low_candle is not None:
+            if current_pivot_low['low'] < nearest_pivot_low_candle['low']:
+                return nearest_rsi_pivot_low
         
     return None
 
