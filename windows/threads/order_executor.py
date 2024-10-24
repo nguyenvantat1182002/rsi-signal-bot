@@ -126,7 +126,7 @@ class OrderExecutorThread(BaseThread):
 
         valid_gaps = list(filter(lambda x: strategy_config.sl_min_price < x < strategy_config.sl_max_price, gaps))
         if valid_gaps:
-            gap = gap[-1] if len(valid_gaps) < 2 else max(valid_gaps)
+            gap = valid_gaps[-1] if len(valid_gaps) < 2 else max(valid_gaps)
             stop_loss_mapping = {
                 0: entry - gap,
                 1: entry + gap
