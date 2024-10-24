@@ -158,7 +158,7 @@ class OrderExecutorThread(BaseThread):
                 if strategy_config.is_running and datetime.now() > strategy_config.next_search_signal_time:
                     timeframe = self.timeframe_mapping[strategy_config.timeframe]
 
-                    if not mt5.positions_get(symbol=strategy_config.symbol):
+                    if not mt5.positions_get(symbol=strategy_config.symbol) and not strategy_config.position:
                         df = self.create_data_frame(strategy_config.symbol, timeframe, strategy_config)
                         
                         result = detector.detect_divergence(df, max_pivot_distance=strategy_config.pivot_distance)
